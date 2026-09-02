@@ -331,19 +331,8 @@ export default function Footer() {
 
           <div className="flex items-center gap-6">
 
-            <Link
-              href="/privacy"
-              className="text-[9px] uppercase tracking-[0.15em] text-white/25 transition-colors hover:text-white"
-            >
-              Privacy
-            </Link>
+           
 
-            <Link
-              href="/terms"
-              className="text-[9px] uppercase tracking-[0.15em] text-white/25 transition-colors hover:text-white"
-            >
-              Terms
-            </Link>
 
             {/* Back To Top */}
 

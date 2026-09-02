@@ -53,13 +53,21 @@ export default function RoomDetailPage() {
     if (!room) return;
     const ctx = gsap.context(() => {
       gsap.from(".room-hero-content", { y: 50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.2 });
-      gsap.from(".room-detail-block", {
-        y: 40, opacity: 0, duration: 0.8, stagger: 0.15, ease: "power3.out",
-        scrollTrigger: { trigger: ".room-details", start: "top 85%", once: true },
+
+      gsap.utils.toArray<HTMLElement>(".room-detail-block").forEach((block, i) => {
+        gsap.fromTo(block, { y: 40, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.8, ease: "power3.out",
+          delay: i * 0.15,
+          scrollTrigger: { trigger: block, start: "top 92%", toggleActions: "play none none none" },
+        });
       });
-      gsap.from(".amenity-block", {
-        y: 30, opacity: 0, duration: 0.6, stagger: 0.08, ease: "power3.out",
-        scrollTrigger: { trigger: ".amenities-grid", start: "top 90%", once: true },
+
+      gsap.utils.toArray<HTMLElement>(".amenity-block").forEach((block, i) => {
+        gsap.fromTo(block, { y: 30, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.6, ease: "power3.out",
+          delay: i * 0.08,
+          scrollTrigger: { trigger: block, start: "top 92%", toggleActions: "play none none none" },
+        });
       });
     }, pageRef);
     return () => ctx.revert();
@@ -77,8 +85,7 @@ export default function RoomDetailPage() {
         <div className="absolute inset-0">
           <img src={room.gallery[activeImage]} alt={room.name} className="w-full h-full object-cover transition-opacity duration-500" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
 
         {/* Image navigation arrows */}
         <button type="button" onClick={() => setActiveImage((p) => (p === 0 ? room.gallery.length - 1 : p - 1))}
@@ -95,7 +102,7 @@ export default function RoomDetailPage() {
         </button>
 
         {/* Dots */}
-        <div className="absolute bottom-20 left-1/2 z-20 -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 flex gap-2 sm:bottom-8">
           {room.gallery.map((_, i) => (
             <button key={i} type="button" onClick={() => setActiveImage(i)}
               className={`h-[3px] transition-all duration-500 ${i === activeImage ? "w-8 bg-[#ff784e]" : "w-4 bg-white/40"}`} />

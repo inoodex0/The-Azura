@@ -203,28 +203,23 @@ export default function Navbar() {
                 <ChevronDown size={16} className={`text-black transition-transform duration-300 ${mobileRoomsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
               </button>
 
-              <div className={`overflow-hidden transition-all duration-500 ${mobileRoomsOpen ? "max-h-[1200px] pb-3" : "max-h-0"}`}>
-                <div className="grid grid-cols-2 gap-3 px-1 pt-1 sm:grid-cols-3 sm:gap-4 sm:px-2">
+              <div className={`overflow-hidden transition-all duration-500 ${mobileRoomsOpen ? "max-h-[800px] pb-3" : "max-h-0"}`}>
+                <div className="flex flex-col px-1 pt-1">
                   {rooms.map((room) => (
-                    <div key={room.name} className="group/room">
-                      <Link href={room.href} onClick={closeMobileMenu} className="block overflow-hidden rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all duration-300 hover:shadow-[0_4px_20px_rgba(255,120,78,0.15)]">
-                        <div className="relative aspect-[4/3] overflow-hidden">
-                          <img src={room.image} alt={room.name} className="h-full w-full object-cover transition-transform duration-500 group-hover/room:scale-110" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                          <span className="absolute bottom-2 left-2 right-2 text-[10px] font-semibold leading-tight text-white drop-shadow sm:text-[11px]">
-                            {room.name}
-                          </span>
-                        </div>
+                    <div key={room.name}>
+                      <Link href={room.href} onClick={closeMobileMenu} className="flex items-center justify-between border-b border-black/[0.05] px-2 py-2.5 text-[11px] font-medium text-black/70 transition-colors hover:text-[#ff784e]">
+                        <span>{room.name}</span>
+                        <ChevronRight size={13} className="text-black/30" />
                       </Link>
                       {room.children && (
-                        <div className={`mt-1.5 overflow-hidden transition-all duration-300 ${mobileSubmenu === room.name ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
-                          <button type="button" onClick={() => setMobileSubmenu(mobileSubmenu === room.name ? null : room.name)} className="flex w-full items-center justify-between px-1 py-1 text-[10px] text-black/60 transition-colors hover:text-[#ff784e]">
+                        <div className={`ml-4 overflow-hidden transition-all duration-300 ${mobileSubmenu === room.name ? "max-h-40 opacity-100 pb-1" : "max-h-0 opacity-0"}`}>
+                          <button type="button" onClick={() => setMobileSubmenu(mobileSubmenu === room.name ? null : room.name)} className="flex w-full items-center justify-between px-1 py-1 text-[10px] text-black/40 transition-colors hover:text-[#ff784e]">
                             <span>View All</span>
                             <ChevronDown size={12} className={`transition-transform duration-300 ${mobileSubmenu === room.name ? "rotate-180 text-[#ff784e]" : ""}`} />
                           </button>
                           <div className="ml-1 border-l-2 border-[#ff784e] pl-2">
                             {room.children.map((child) => (
-                              <Link key={child.name} href={child.href} onClick={closeMobileMenu} className="block py-1 text-[10px] text-black/60 transition-colors hover:text-[#ff784e]">
+                              <Link key={child.name} href={child.href} onClick={closeMobileMenu} className="block py-1 text-[10px] text-black/50 transition-colors hover:text-[#ff784e]">
                                 {child.name}
                               </Link>
                             ))}
