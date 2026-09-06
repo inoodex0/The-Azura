@@ -346,7 +346,7 @@ export default function RoomsPage() {
                             className="inline-flex items-center gap-2 border border-black/10 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
                             <Phone size={13} /> Call
                           </a>
-                          <Link href={`/booking?room=${room.id}`}
+                          <Link href={`/checkout?room=${room.id}`}
                             className="group/btn inline-flex items-center gap-2 bg-[#ff784e] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-[0.1em] hover:bg-[#1a1a1a] transition-all rounded-lg">
                             Book Now <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-0.5" />
                           </Link>

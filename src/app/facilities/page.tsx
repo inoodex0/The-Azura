@@ -99,36 +99,28 @@ export default function FacilitiesPage() {
         delay: 0.2,
       });
 
-      gsap.from(".fac-card", {
-        y: 60,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.2,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".fac-grid",
-          start: "top 80%",
-          once: true,
-        },
+      gsap.utils.toArray<HTMLElement>(".fac-card").forEach((card, i) => {
+        gsap.fromTo(card, { y: 60, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 1, ease: "power3.out",
+          delay: i * 0.2,
+          scrollTrigger: { trigger: card, start: "top 92%", toggleActions: "play none none none" },
+        });
       });
 
-      gsap.from(".fac-row", {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".fac-row",
-          start: "top 80%",
-          once: true,
-        },
+      gsap.utils.toArray<HTMLElement>(".fac-row").forEach((row) => {
+        gsap.fromTo(row, { y: 50, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 1, ease: "power3.out",
+          scrollTrigger: { trigger: row, start: "top 92%", toggleActions: "play none none none" },
+        });
       });
 
-      gsap.from(".marquee-track", {
-        x: 0,
-        duration: 20,
-        ease: "none",
-        repeat: -1,
+      gsap.utils.toArray<HTMLElement>(".marquee-track").forEach((track) => {
+        gsap.fromTo(track, { x: 0 }, {
+          x: "-50%",
+          duration: 25,
+          ease: "none",
+          repeat: -1,
+        });
       });
     }, pageRef);
 

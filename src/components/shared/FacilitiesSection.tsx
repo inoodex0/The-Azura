@@ -128,40 +128,50 @@ export default function FacilitiesSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-[#ff784e] py-20 sm:py-28 lg:py-36"
+      className="relative overflow-hidden bg-[#e85d04] py-24 sm:py-32 lg:py-40"
     >
+      {/* Decorative Number */}
+      <div className="pointer-events-none absolute -left-10 top-16 select-none text-[180px] font-bold leading-none tracking-[-0.08em] text-white/[0.025] sm:text-[260px] lg:text-[360px]">
+        02
+      </div>
 
-      <div className="mx-auto max-w-[1500px] px-4 sm:px-8 lg:px-10">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
 
         {/* ===================================================== */}
         {/* HEADER */}
         {/* ===================================================== */}
 
-        <div className="facility-heading mb-10 lg:mb-14">
+        <div className="facility-heading mb-14 grid grid-cols-1 gap-8 lg:mb-16 lg:grid-cols-[1fr_auto] lg:items-end">
 
-          {/* Label */}
-          <div className="mb-5 flex items-center gap-3">
-            <span className="h-[2px] w-10 bg-white" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/80">
-              Hotel Facilities
-            </span>
-          </div>
+          <div>
+            {/* Label */}
+            <div className="mb-6 flex items-center gap-3">
+              <span className="h-[2px] w-10 bg-[#e85d04]" />
 
-          {/* Heading */}
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
-            <h2 className="max-w-2xl text-4xl font-light leading-[1.05] tracking-[-0.035em] text-black sm:text-5xl lg:text-6xl">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#e85d04]">
+                Hotel Facilities
+              </span>
+            </div>
+
+            {/* Heading */}
+            <h2 className="max-w-3xl text-4xl font-light leading-[1] tracking-[-0.04em] text-white sm:text-5xl lg:text-7xl">
               Everything you need,
               <br />
-              <span className="font-semibold">all in one place.</span>
+              <span className="font-semibold">
+                all in one place.
+              </span>
             </h2>
+          </div>
 
-            {/* Description */}
-            <p className="max-w-xs border-l-2 border-white pb-1 pl-5 text-sm leading-7 text-black/60">
+          {/* Description */}
+          <div className="max-w-sm lg:pb-1">
+            <p className="border-l-2 border-[#e85d04] pl-5 text-sm leading-7 text-white/45">
               From wellness and dining to leisure and convenience,
               discover everything designed to make your stay
               effortless.
             </p>
           </div>
+
         </div>
 
         {/* ===================================================== */}
@@ -199,15 +209,22 @@ export default function FacilitiesSection() {
         {/* BOTTOM CTA */}
         {/* ===================================================== */}
 
-        <div className="facility-bottom mt-14 flex flex-col items-center gap-6 border-t border-black/10 pt-8 text-center">
+        <div className="facility-bottom mt-14 flex flex-col justify-between gap-6 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
+
+          <div>
+            <p className="text-xs leading-6 text-white/35">
+              Designed around your comfort.
+              Created around your experience.
+            </p>
+          </div>
 
           <Link
             href="/facilities"
-            className="group flex w-fit items-center gap-4 border border-black px-7 py-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-black transition-all duration-300 hover:border-black hover:bg-black hover:text-white"
+            className="group flex w-fit items-center gap-4 border border-white/20 px-6 py-3.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white transition-all duration-300 hover:border-[#e85d04] hover:bg-[#e85d04]"
           >
             Explore All Facilities
 
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black text-[#ff784e] transition-all duration-300 group-hover:bg-[#ff784e] group-hover:text-white">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e85d04] transition-all duration-300 group-hover:bg-white group-hover:text-[#e85d04]">
               <ArrowUpRight size={14} />
             </span>
           </Link>
@@ -245,7 +262,7 @@ function FacilityCard({
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace("&", "and")}`}
-      className={`facility-card group relative block overflow-hidden bg-black ${
+      className={`facility-card group relative block overflow-hidden bg-white ${
         large
           ? "aspect-[16/10] sm:aspect-[16/9]"
           : "aspect-[1/1]"
@@ -263,27 +280,32 @@ function FacilityCard({
       />
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent transition-all duration-500 group-hover:from-black/90" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-90 transition-all duration-500 group-hover:opacity-100" />
 
       {/* Hover Orange Overlay */}
-      <div className="absolute inset-0 bg-[#ff784e]/0 transition-all duration-500 group-hover:bg-[#ff784e]/10" />
+      <div className="absolute inset-0 bg-[#e85d04]/0 transition-all duration-500 group-hover:bg-[#e85d04]/10" />
 
       {/* ================================================= */}
       {/* TOP ICON */}
       {/* ================================================= */}
 
-      <div className="absolute left-5 top-5 z-10 hidden h-11 w-11 items-center justify-center border border-white/30 bg-black/20 text-white backdrop-blur-sm transition-all duration-500 group-hover:border-[#ff784e] group-hover:bg-[#ff784e] sm:flex">
+      <div className="absolute left-5 top-5 flex h-11 w-11 items-center justify-center border border-white/30 bg-black/20 text-white backdrop-blur-sm transition-all duration-500 group-hover:border-[#e85d04] group-hover:bg-[#e85d04]">
         <Icon size={18} strokeWidth={1.5} />
       </div>
+
+      {/* Number */}
+      <span className="absolute right-5 top-5 text-[10px] font-medium tracking-[0.2em] text-white/60">
+        0{facility.id}
+      </span>
 
       {/* ================================================= */}
       {/* CONTENT */}
       {/* ================================================= */}
 
-      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 sm:p-7">
+      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
 
         {/* Subtitle */}
-        <span className="mb-1 block text-[8px] font-semibold uppercase tracking-[0.2em] text-[#ff784e] sm:mb-2 sm:text-[9px]">
+        <span className="mb-2 block text-[9px] font-semibold uppercase tracking-[0.2em] text-[#e85d04]">
           {facility.subtitle}
         </span>
 
@@ -294,8 +316,8 @@ function FacilityCard({
             <h3
               className={`font-semibold tracking-[-0.025em] text-white ${
                 large
-                  ? "text-2xl sm:text-3xl sm:text-4xl"
-                  : "text-lg sm:text-2xl"
+                  ? "text-3xl sm:text-4xl"
+                  : "text-2xl"
               }`}
             >
               {facility.title}
@@ -310,15 +332,15 @@ function FacilityCard({
           </div>
 
           {/* Arrow */}
-          <span className="flex h-11 w-11 shrink-0 translate-y-2 items-center justify-center rounded-full bg-white text-black opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:bg-[#ff784e] group-hover:text-white group-hover:opacity-100">
+          <span className="flex h-11 w-11 shrink-0 translate-y-2 items-center justify-center rounded-full bg-white text-black opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:bg-[#e85d04] group-hover:text-white group-hover:opacity-100">
             <ArrowUpRight size={18} />
           </span>
 
         </div>
 
         {/* Bottom Line */}
-        <div className="mt-3 h-px w-full bg-white/20 sm:mt-5">
-          <div className="h-full w-0 bg-[#ff784e] transition-all duration-700 group-hover:w-full" />
+        <div className="mt-5 h-px w-full bg-white/20">
+          <div className="h-full w-0 bg-[#e85d04] transition-all duration-700 group-hover:w-full" />
         </div>
 
       </div>
