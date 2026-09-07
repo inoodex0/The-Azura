@@ -8,6 +8,7 @@ interface DatePickerProps {
   checkOut: string;
   onCheckInChange: (date: string) => void;
   onCheckOutChange: (date: string) => void;
+  singleMonth?: boolean;
 }
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -149,7 +150,7 @@ export default function DatePicker({
                 type="button"
                 disabled={isPast}
                 onClick={() => handleDateClick(dateStr)}
-                className={`relative flex h-8 w-full items-center justify-center rounded-lg text-xs transition-all duration-150 ${bgClass}`}
+                className={`relative flex h-7 w-full items-center justify-center rounded-lg text-[11px] transition-all duration-150 sm:h-8 sm:text-xs ${bgClass}`}
               >
                 {isToday && !(isCheckIn || isCheckOut) && (
                   <span className="absolute inset-0 rounded-lg border border-[#ff784e]/40" />
@@ -165,35 +166,35 @@ export default function DatePicker({
 
   return (
     <div ref={panelRef} className="w-full rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <button type="button" onClick={prevMonth} className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e]">
-          <ChevronLeft size={16} />
+      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3">
+        <button type="button" onClick={prevMonth} className="flex h-7 w-7 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
+          <ChevronLeft size={14} />
         </button>
-        <div className="flex gap-6 text-xs font-medium text-white/50">
+        <div className="flex gap-3 text-[11px] font-medium text-white/50 sm:gap-6 sm:text-xs">
           <button
             type="button"
             onClick={() => setSelecting("checkin")}
-            className={`rounded-full px-3 py-1 transition ${selecting === "checkin" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
+            className={`rounded-full px-2 py-0.5 transition sm:px-3 sm:py-1 ${selecting === "checkin" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
           >
             Check-in {checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
           </button>
           <button
             type="button"
             onClick={() => setSelecting("checkout")}
-            className={`rounded-full px-3 py-1 transition ${selecting === "checkout" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
+            className={`rounded-full px-2 py-0.5 transition sm:px-3 sm:py-1 ${selecting === "checkout" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
           >
             Check-out {checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
           </button>
         </div>
-        <button type="button" onClick={nextMonth} className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e]">
-          <ChevronRight size={16} />
+        <button type="button" onClick={nextMonth} className="flex h-7 w-7 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
+          <ChevronRight size={14} />
         </button>
       </div>
 
       <div className="flex gap-0 p-4">
         {renderMonth(leftYear, leftMonth)}
-        <div className="mx-3 w-px bg-white/10" />
-        {renderMonth(rightYear, rightMonth)}
+        <div className="mx-3 hidden w-px bg-white/10 sm:block" />
+        <div className="hidden sm:block">{renderMonth(rightYear, rightMonth)}</div>
       </div>
     </div>
   );

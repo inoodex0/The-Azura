@@ -47,7 +47,12 @@ export default function Hero() {
 
   const openDate = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setCalendarPos({ top: Math.max(8, rect.top - 420), left: Math.min(window.innerWidth - 624, rect.left) });
+    const isMobile = window.innerWidth < 640;
+    if (isMobile) {
+      setCalendarPos({ top: 8, left: 12 });
+    } else {
+      setCalendarPos({ top: Math.max(8, rect.top - 420), left: Math.min(window.innerWidth - 624, rect.left) });
+    }
     setDateOpen(!dateOpen);
     setGuestsOpen(false);
     setRoomsOpen(false);
@@ -423,8 +428,8 @@ export default function Hero() {
         <div
           data-lenis-prevent
           onClick={(e) => e.stopPropagation()}
-          className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl w-[calc(100vw-24px)] max-w-[600px]"
-          style={{ top: calendarPos.top, left: calendarPos.left }}
+          className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{ top: calendarPos.top, left: calendarPos.left, width: "min(100vw - 24px, 600px)" }}
         >
           <DatePicker
             checkIn={checkIn}

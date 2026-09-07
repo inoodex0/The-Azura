@@ -162,9 +162,9 @@ export default function Footer() {
 
                   <Link
                     href={link.href}
-                    className="group flex w-fit items-center gap-2 text-sm text-white/50 transition-colors duration-300 hover:text-white"
+                    className="group flex w-fit items-center gap-2 text-sm text-white/50 visited:text-white/50 no-underline transition-colors duration-150 hover:text-white"
                   >
-                    <span className="h-px w-0 bg-[#ff784e] transition-all duration-300 group-hover:w-4" />
+                    <span className="h-px w-0 bg-[#ff784e] transition-all duration-150 group-hover:w-4" />
 
                     {link.name}
                   </Link>
@@ -193,9 +193,9 @@ export default function Footer() {
 
                   <Link
                     href={link.href}
-                    className="group flex w-fit items-center gap-2 text-sm text-white/50 transition-colors duration-300 hover:text-white"
+                    className="group flex w-fit items-center gap-2 text-sm text-white/50 visited:text-white/50 no-underline transition-colors duration-150 hover:text-white"
                   >
-                    <span className="h-px w-0 bg-[#ff784e] transition-all duration-300 group-hover:w-4" />
+                    <span className="h-px w-0 bg-[#ff784e] transition-all duration-150 group-hover:w-4" />
 
                     {link.name}
                   </Link>
@@ -241,7 +241,7 @@ export default function Footer() {
 
               <a
                 href="tel:+8801234567890"
-                className="flex gap-4 text-sm text-white/50 transition-colors hover:text-white"
+                className="flex gap-4 text-sm text-white/50 visited:text-white/50 no-underline transition-colors duration-150 hover:text-white"
               >
 
                 <Phone
@@ -258,7 +258,7 @@ export default function Footer() {
 
               <a
                 href="mailto:hello@theazura.com"
-                className="flex gap-4 text-sm text-white/50 transition-colors hover:text-white"
+                className="flex gap-4 text-sm text-white/50 visited:text-white/50 no-underline transition-colors duration-150 hover:text-white"
               >
 
                 <Mail
