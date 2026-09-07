@@ -42,7 +42,14 @@ function RoomDetailInner() {
   const [activeImage, setActiveImage] = useState(0);
 
   const room = roomsData.find((r) => r.slug === slug);
-  const bookingParams = `checkin=${searchParams.get("checkin") || ""}&checkout=${searchParams.get("checkout") || ""}&adults=${searchParams.get("adults") || "2"}&children=${searchParams.get("children") || "0"}&rooms=${searchParams.get("rooms") || "1"}`;
+
+  const [checkIn, setCheckIn] = useState(searchParams.get("checkin") || "");
+  const [checkOut, setCheckOut] = useState(searchParams.get("checkout") || "");
+  const [adults, setAdults] = useState(Number(searchParams.get("adults")) || 2);
+  const [childrenCount, setChildrenCount] = useState(Number(searchParams.get("children")) || 0);
+  const [roomsCount, setRoomsCount] = useState(Number(searchParams.get("rooms")) || 1);
+
+  const bookingLink = `/checkout?room=${room?.slug}&checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${childrenCount}&rooms=${roomsCount}`;
 
   useEffect(() => {
     if (!room) {
@@ -151,7 +158,7 @@ function RoomDetailInner() {
                   className="inline-flex items-center gap-2 border border-white/25 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
                   <Phone size={13} /> Call to Book
                 </a>
-                <Link href={`/checkout?room=${room.slug}&${bookingParams}`}
+                <Link href={bookingLink}
                   className="group/btn inline-flex items-center gap-2 bg-[#ff784e] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-[0.12em] hover:bg-white hover:text-[#1a1a1a] transition-all rounded-lg">
                   Book Now <ArrowUpRight size={13} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                 </Link>
@@ -244,8 +251,46 @@ function RoomDetailInner() {
 
                 <div className="my-5 h-px bg-black/5" />
 
-                <Link href={`/checkout?room=${room.slug}&${bookingParams}`}
-                  className="group flex w-full items-center justify-center gap-2 bg-[#ff784e] text-white py-4 text-[11px] font-bold uppercase tracking-[0.12em] hover:bg-[#1a1a1a] transition-all rounded-lg">
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Check-in</label>
+                    <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)}
+                      className="w-full rounded-lg border border-black/10 px-3 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Check-out</label>
+                    <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)}
+                      className="w-full rounded-lg border border-black/10 px-3 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Adults</label>
+                      <select value={adults} onChange={(e) => setAdults(Number(e.target.value))}
+                        className="w-full rounded-lg border border-black/10 px-2 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
+                        {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Children</label>
+                      <select value={childrenCount} onChange={(e) => setChildrenCount(Number(e.target.value))}
+                        className="w-full rounded-lg border border-black/10 px-2 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
+                        {[0,1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Rooms</label>
+                      <select value={roomsCount} onChange={(e) => setRoomsCount(Number(e.target.value))}
+                        className="w-full rounded-lg border border-black/10 px-2 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
+                        {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="my-5 h-px bg-black/5" />
+
+                <Link href={bookingLink}
+                  className="group flex w-full items-center justify-center gap-2 bg-[#ff784e] text-white py-4 text-[11px] font-bold uppercase tracking-[0.12em] hover:bg-white hover:text-[#1a1a1a] border border-transparent hover:border-[#ff784e] transition-all rounded-lg">
                   Check Availability <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
 
