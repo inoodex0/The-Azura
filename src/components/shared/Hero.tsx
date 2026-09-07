@@ -51,14 +51,19 @@ export default function Hero() {
     const rect = e.currentTarget.getBoundingClientRect();
     const calendarH = 400;
     const spaceBelow = window.innerHeight - rect.bottom;
-    const flip = spaceBelow < calendarH;
-    setCalendarFlipBelow(!flip);
-    setCalendarSide(side);
-    if (flip) {
-      setCalendarPos({ top: rect.top - calendarH - 8, left: side === "left" ? rect.left : rect.right - 600 });
+
+    if (window.innerWidth < 640) {
+      setCalendarPos({ top: window.innerHeight / 2, left: window.innerWidth / 2 });
     } else {
-      setCalendarPos({ top: rect.bottom + 8, left: side === "left" ? rect.left : rect.right - 600 });
+      const flip = spaceBelow < calendarH;
+      setCalendarFlipBelow(!flip);
+      if (flip) {
+        setCalendarPos({ top: rect.top - calendarH - 8, left: side === "left" ? rect.left : rect.right - 600 });
+      } else {
+        setCalendarPos({ top: rect.bottom + 8, left: side === "left" ? rect.left : rect.right - 600 });
+      }
     }
+    setCalendarSide(side);
     setDateOpen(!dateOpen);
     setGuestsOpen(false);
     setRoomsOpen(false);
@@ -537,7 +542,7 @@ export default function Hero() {
         <div
           data-lenis-prevent
           onClick={(e) => e.stopPropagation()}
-          className="fixed z-[100] w-[calc(100vw-24px)] max-w-[600px] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          className="fixed z-[100] w-[calc(100vw-24px)] max-w-[600px] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
           style={{ top: calendarPos.top, left: calendarPos.left }}
         >
           <DatePicker
