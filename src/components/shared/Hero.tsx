@@ -22,31 +22,57 @@ const slides = [
   { src: "/images/room3.avif", alt: "Executive Room" },
 ];
 
-function computePosition(
-  btnRect: DOMRect,
+const NAV_HEIGHT = 80;
+const GAP = 8;
+
+function computeDropdownPosition(
+  triggerRect: DOMRect,
   dropdownHeight: number,
   dropdownWidth: number
 ): { top: number; left: number; fullWidth?: boolean } {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const isMobile = vw < 640;
-  const navBarHeight = 80;
 
   if (isMobile) {
-    const top = btnRect.top - dropdownHeight - 4;
-    if (top >= navBarHeight + 8) {
-      return { top, left: 0, fullWidth: true };
+    const spaceBelow = vh - triggerRect.bottom - GAP;
+    const spaceAbove = triggerRect.top - NAV_HEIGHT - GAP;
+
+    if (spaceBelow >= dropdownHeight) {
+      return { top: triggerRect.bottom + GAP, left: 0, fullWidth: true };
     }
-    return { top: navBarHeight + 8, left: 0, fullWidth: true };
+    if (spaceAbove >= dropdownHeight) {
+      return { top: Math.max(NAV_HEIGHT + GAP, triggerRect.top - dropdownHeight - GAP), left: 0, fullWidth: true };
+    }
+    return { top: NAV_HEIGHT + GAP, left: 0, fullWidth: true };
   }
 
-  const left = btnRect.left + btnRect.width / 2 - dropdownWidth / 2;
-  const top = btnRect.top - dropdownHeight - 4;
+  const spaceBelow = vh - triggerRect.bottom - GAP;
+  const spaceAbove = triggerRect.top - NAV_HEIGHT - GAP;
 
-  return {
-    top: Math.max(navBarHeight + 10, top),
-    left: Math.max(12, Math.min(left, vw - dropdownWidth - 12)),
-  };
+  let top: number;
+  let left: number;
+
+  if (spaceBelow >= dropdownHeight) {
+    top = triggerRect.bottom + GAP;
+    left = triggerRect.left + triggerRect.width / 2 - dropdownWidth / 2;
+  } else if (spaceAbove >= dropdownHeight) {
+    top = triggerRect.top - dropdownHeight - GAP;
+    left = triggerRect.left + triggerRect.width / 2 - dropdownWidth / 2;
+  } else {
+    if (triggerRect.left >= vw - triggerRect.right) {
+      left = triggerRect.left;
+      top = triggerRect.top;
+    } else {
+      left = triggerRect.right - dropdownWidth;
+      top = triggerRect.top;
+    }
+  }
+
+  left = Math.max(GAP, Math.min(left, vw - dropdownWidth - GAP));
+  top = Math.max(NAV_HEIGHT + GAP, Math.min(top, vh - dropdownHeight - GAP));
+
+  return { top, left };
 }
 
 export default function Hero() {
@@ -65,9 +91,9 @@ export default function Hero() {
   const [dateOpen, setDateOpen] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [roomsOpen, setRoomsOpen] = useState(false);
-  const [calendarPos, setCalendarPos] = useState<{ top: number; left: number; fullWidth?: boolean; bottom?: boolean }>({ top: 0, left: 0 });
-  const [guestsPos, setGuestsPos] = useState<{ top: number; left: number; fullWidth?: boolean; bottom?: boolean }>({ top: 0, left: 0 });
-  const [roomsPos, setRoomsPos] = useState<{ top: number; left: number; fullWidth?: boolean; bottom?: boolean }>({ top: 0, left: 0 });
+  const [calendarPos, setCalendarPos] = useState<{ top: number; left: number; fullWidth?: boolean }>({ top: 0, left: 0 });
+  const [guestsPos, setGuestsPos] = useState<{ top: number; left: number; fullWidth?: boolean }>({ top: 0, left: 0 });
+  const [roomsPos, setRoomsPos] = useState<{ top: number; left: number; fullWidth?: boolean }>({ top: 0, left: 0 });
 
   const closeAll = () => { setDateOpen(false); setGuestsOpen(false); setRoomsOpen(false); };
 
@@ -75,7 +101,7 @@ export default function Hero() {
     if (dateOpen) { closeAll(); return; }
     const rect = e.currentTarget.getBoundingClientRect();
     const isMob = window.innerWidth < 640;
-    const pos = computePosition(rect, isMob ? 320 : 400, isMob ? window.innerWidth : 420);
+    const pos = computeDropdownPosition(rect, isMob ? 320 : 400, isMob ? window.innerWidth - 24 : 520);
     setCalendarPos(pos);
     setDateOpen(true);
     setGuestsOpen(false);
@@ -85,7 +111,8 @@ export default function Hero() {
   const openGuests = (btn: HTMLButtonElement) => {
     if (guestsOpen) { closeAll(); return; }
     const rect = btn.getBoundingClientRect();
-    const pos = computePosition(rect, 200, 256);
+    const isMob = window.innerWidth < 640;
+    const pos = computeDropdownPosition(rect, isMob ? 180 : 180, isMob ? window.innerWidth - 24 : 280);
     setGuestsPos(pos);
     setGuestsOpen(true);
     setRoomsOpen(false);
@@ -95,7 +122,8 @@ export default function Hero() {
   const openRooms = (btn: HTMLButtonElement) => {
     if (roomsOpen) { closeAll(); return; }
     const rect = btn.getBoundingClientRect();
-    const pos = computePosition(rect, 120, 208);
+    const isMob = window.innerWidth < 640;
+    const pos = computeDropdownPosition(rect, isMob ? 100 : 100, isMob ? window.innerWidth - 24 : 240);
     setRoomsPos(pos);
     setRoomsOpen(true);
     setGuestsOpen(false);
