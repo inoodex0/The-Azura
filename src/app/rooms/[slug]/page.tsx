@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -34,13 +34,15 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; className?: s
   Wifi, Tv, Wind, Coffee, Bath, Utensils, Sparkles, Lock,
 };
 
-export default function RoomDetailPage() {
+function RoomDetailInner() {
   const { slug } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const pageRef = useRef<HTMLDivElement>(null);
   const [activeImage, setActiveImage] = useState(0);
 
   const room = roomsData.find((r) => r.slug === slug);
+  const bookingParams = `checkin=${searchParams.get("checkin") || ""}&checkout=${searchParams.get("checkout") || ""}&adults=${searchParams.get("adults") || "2"}&children=${searchParams.get("children") || "0"}&rooms=${searchParams.get("rooms") || "1"}`;
 
   useEffect(() => {
     if (!room) {
@@ -149,7 +151,7 @@ export default function RoomDetailPage() {
                   className="inline-flex items-center gap-2 border border-white/25 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
                   <Phone size={13} /> Call to Book
                 </a>
-                <Link href={`/checkout?room=${room.slug}`}
+                <Link href={`/checkout?room=${room.slug}&${bookingParams}`}
                   className="group/btn inline-flex items-center gap-2 bg-[#ff784e] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-[0.12em] hover:bg-white hover:text-[#1a1a1a] transition-all rounded-lg">
                   Book Now <ArrowUpRight size={13} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                 </Link>
@@ -242,7 +244,7 @@ export default function RoomDetailPage() {
 
                 <div className="my-5 h-px bg-black/5" />
 
-                <Link href={`/checkout?room=${room.slug}`}
+                <Link href={`/checkout?room=${room.slug}&${bookingParams}`}
                   className="group flex w-full items-center justify-center gap-2 bg-[#ff784e] text-white py-4 text-[11px] font-bold uppercase tracking-[0.12em] hover:bg-[#1a1a1a] transition-all rounded-lg">
                   Check Availability <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
@@ -350,5 +352,13 @@ export default function RoomDetailPage() {
       </section>
 
     </main>
+  );
+}
+
+export default function RoomDetailPage() {
+  return (
+    <Suspense fallback={<div />}>
+      <RoomDetailInner />
+    </Suspense>
   );
 }

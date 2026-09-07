@@ -36,34 +36,18 @@ export default function Hero() {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [rooms, setRooms] = useState(1);
+  const [dateOpen, setDateOpen] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [roomsOpen, setRoomsOpen] = useState(false);
-  const [dateOpen, setDateOpen] = useState(false);
-  const [calendarSide, setCalendarSide] = useState<"left" | "right">("left");
-  const [calendarFlipBelow, setCalendarFlipBelow] = useState(true);
   const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
   const guestsBtnRef = useRef<HTMLButtonElement>(null);
   const roomsBtnRef = useRef<HTMLButtonElement>(null);
   const [guestsPos, setGuestsPos] = useState({ top: 0, left: 0 });
   const [roomsPos, setRoomsPos] = useState({ top: 0, left: 0 });
 
-  const openCalendar = (e: React.MouseEvent, side: "left" | "right") => {
+  const openDate = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const calendarH = 400;
-    const spaceBelow = window.innerHeight - rect.bottom;
-
-    if (window.innerWidth < 640) {
-      setCalendarPos({ top: window.innerHeight / 2, left: window.innerWidth / 2 });
-    } else {
-      const flip = spaceBelow < calendarH;
-      setCalendarFlipBelow(!flip);
-      if (flip) {
-        setCalendarPos({ top: rect.top - calendarH - 8, left: side === "left" ? rect.left : rect.right - 600 });
-      } else {
-        setCalendarPos({ top: rect.bottom + 8, left: side === "left" ? rect.left : rect.right - 600 });
-      }
-    }
-    setCalendarSide(side);
+    setCalendarPos({ top: Math.max(8, rect.top - 420), left: Math.min(window.innerWidth - 624, rect.left) });
     setDateOpen(!dateOpen);
     setGuestsOpen(false);
     setRoomsOpen(false);
@@ -149,6 +133,22 @@ export default function Hero() {
       return () => window.removeEventListener("scroll", onScroll);
     }
   }, [dateOpen, guestsOpen, roomsOpen]);
+
+  const DateButton = ({ label, value, side }: { label: string; value: string; side: "left" | "right" }) => (
+    <button type="button" onClick={openDate}
+      className="group flex w-full items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
+      <CalendarDays size={15} className="text-[#ff784e] shrink-0 sm:hidden" />
+      <CalendarDays size={18} className="text-[#ff784e] shrink-0 hidden sm:block" />
+      <div className="flex flex-1 flex-col min-w-0">
+        <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35 sm:text-[9px] sm:tracking-[0.18em]">{label}</span>
+        <span className="mt-0.5 text-[12px] font-medium text-white truncate sm:mt-1 sm:text-sm">
+          {value ? new Date(value + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Select"}
+        </span>
+      </div>
+      <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 sm:hidden ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+      <ChevronDown size={14} className={`hidden text-white/30 transition-all duration-300 sm:block ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+    </button>
+  );
 
   return (
     <section className="relative min-h-[100dvh] bg-black sm:h-screen">
@@ -299,41 +299,13 @@ export default function Hero() {
             {/* Mobile layout */}
             <div className="p-2.5 sm:hidden">
               <div className="grid grid-cols-2 gap-2">
-                <div className="relative">
-                  <button type="button"
-                    onClick={(e) => openCalendar(e, "left")}
-                    className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
-                    <CalendarDays size={15} className="text-[#ff784e] shrink-0" />
-                    <div className="flex flex-1 flex-col min-w-0">
-                      <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Check-in</span>
-                      <span className="mt-0.5 text-[12px] font-medium text-white truncate">{checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}</span>
-                    </div>
-                    <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                  </button>
-                </div>
-
-                <div className="relative">
-                  <button type="button"
-                    onClick={(e) => openCalendar(e, "right")}
-                    className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
-                    <CalendarDays size={15} className="text-[#ff784e] shrink-0" />
-                    <div className="flex flex-1 flex-col min-w-0">
-                      <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Check-out</span>
-                      <span className="mt-0.5 text-[12px] font-medium text-white truncate">{checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}</span>
-                    </div>
-                    <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                  </button>
-                </div>
+                <DateButton label="Check-in" value={checkIn} side="left" />
+                <DateButton label="Check-out" value={checkOut} side="right" />
 
                 <button type="button"
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    if (spaceBelow < 200) {
-                      setGuestsPos({ top: rect.top - 200, left: rect.left });
-                    } else {
-                      setGuestsPos({ top: rect.bottom + 8, left: rect.left });
-                    }
+                    setGuestsPos({ top: Math.max(8, rect.top - 180), left: Math.min(window.innerWidth - 270, rect.left) });
                     setGuestsOpen(!guestsOpen);
                     setRoomsOpen(false);
                     setDateOpen(false);
@@ -350,12 +322,7 @@ export default function Hero() {
                 <button type="button"
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    if (spaceBelow < 200) {
-                      setRoomsPos({ top: rect.top - 200, left: rect.left });
-                    } else {
-                      setRoomsPos({ top: rect.bottom + 8, left: rect.left });
-                    }
+                    setRoomsPos({ top: Math.max(8, rect.top - 100), left: Math.min(window.innerWidth - 220, rect.left) });
                     setRoomsOpen(!roomsOpen);
                     setGuestsOpen(false);
                     setDateOpen(false);
@@ -378,42 +345,8 @@ export default function Hero() {
             {/* Desktop layout */}
             <div className="hidden sm:block p-4 lg:p-5">
               <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
-
-                {/* Check-in Date */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={(e) => openCalendar(e, "left")}
-                    className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.05] px-5 py-3.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08]"
-                  >
-                    <span className="text-[#ff784e]"><CalendarDays size={18} /></span>
-                    <span className="flex flex-1 flex-col">
-                      <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">Check-in</span>
-                      <span className="mt-1 whitespace-nowrap text-sm font-medium text-white">
-                        {checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Select date"}
-                      </span>
-                    </span>
-                    <ChevronDown size={14} className={`text-white/30 transition-all duration-300 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                  </button>
-                </div>
-
-                {/* Check-out Date */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={(e) => openCalendar(e, "right")}
-                    className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.05] px-5 py-3.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08]"
-                  >
-                    <span className="text-[#ff784e]"><CalendarDays size={18} /></span>
-                    <span className="flex flex-1 flex-col">
-                      <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">Check-out</span>
-                      <span className="mt-1 whitespace-nowrap text-sm font-medium text-white">
-                        {checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Select date"}
-                      </span>
-                    </span>
-                    <ChevronDown size={14} className={`text-white/30 transition-all duration-300 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                  </button>
-                </div>
+                <DateButton label="Check-in" value={checkIn} side="left" />
+                <DateButton label="Check-out" value={checkOut} side="right" />
 
                 {/* Guests Dropdown */}
                 <div className="relative">
@@ -423,7 +356,7 @@ export default function Hero() {
                     onClick={() => {
                       if (!guestsOpen && guestsBtnRef.current) {
                         const rect = guestsBtnRef.current.getBoundingClientRect();
-                        setGuestsPos({ top: rect.bottom + 8, left: rect.left });
+                        setGuestsPos({ top: Math.max(8, rect.top - 180), left: Math.min(window.innerWidth - 270, rect.left) });
                       }
                       setGuestsOpen(!guestsOpen);
                       setRoomsOpen(false);
@@ -449,7 +382,7 @@ export default function Hero() {
                     onClick={() => {
                       if (!roomsOpen && roomsBtnRef.current) {
                         const rect = roomsBtnRef.current.getBoundingClientRect();
-                        setRoomsPos({ top: rect.bottom + 8, left: rect.left });
+                        setRoomsPos({ top: Math.max(8, rect.top - 100), left: Math.min(window.innerWidth - 220, rect.left) });
                       }
                       setRoomsOpen(!roomsOpen);
                       setGuestsOpen(false);
@@ -474,7 +407,6 @@ export default function Hero() {
                   Check Availability
                   <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
-
               </div>
             </div>
           </div>
@@ -482,16 +414,37 @@ export default function Hero() {
       </div>
 
       {/* Click outside to close dropdowns */}
-      {(guestsOpen || roomsOpen || dateOpen) && (
-        <div className="fixed inset-0 z-[99]" onClick={() => { setGuestsOpen(false); setRoomsOpen(false); setDateOpen(false); }} />
+      {(dateOpen || guestsOpen || roomsOpen) && (
+        <div className="fixed inset-0 z-[99]" onClick={() => { setDateOpen(false); setGuestsOpen(false); setRoomsOpen(false); }} />
+      )}
+
+      {/* Calendar portal */}
+      {dateOpen && typeof window !== "undefined" && createPortal(
+        <div
+          data-lenis-prevent
+          onClick={(e) => e.stopPropagation()}
+          className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl w-[calc(100vw-24px)] max-w-[600px]"
+          style={{ top: calendarPos.top, left: calendarPos.left }}
+        >
+          <DatePicker
+            checkIn={checkIn}
+            checkOut={checkOut}
+            onCheckInChange={(d) => setCheckIn(d)}
+            onCheckOutChange={(d) => {
+              setCheckOut(d);
+              if (d) setDateOpen(false);
+            }}
+          />
+        </div>,
+        document.body
       )}
 
       {/* Guests portal */}
       {guestsOpen && typeof window !== "undefined" && createPortal(
         <div
           data-lenis-prevent
-          className="fixed z-[100] w-64 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
-          style={window.innerWidth >= 640 ? { top: guestsPos.top, left: guestsPos.left } : undefined}
+          className="fixed z-[100] w-64 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{ top: guestsPos.top, left: guestsPos.left }}
         >
           <div className="p-4">
             <div className="flex items-center justify-between py-3">
@@ -520,8 +473,8 @@ export default function Hero() {
       {roomsOpen && typeof window !== "undefined" && createPortal(
         <div
           data-lenis-prevent
-          className="fixed z-[100] w-52 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
-          style={window.innerWidth >= 640 ? { top: roomsPos.top, left: roomsPos.left } : undefined}
+          className="fixed z-[100] w-52 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{ top: roomsPos.top, left: roomsPos.left }}
         >
           <div className="p-4">
             <div className="flex items-center justify-between py-3">
@@ -533,27 +486,6 @@ export default function Hero() {
               </div>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Calendar portal */}
-      {dateOpen && typeof window !== "undefined" && createPortal(
-        <div
-          data-lenis-prevent
-          onClick={(e) => e.stopPropagation()}
-          className="fixed z-[100] w-[calc(100vw-24px)] max-w-[600px] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
-          style={{ top: calendarPos.top, left: calendarPos.left }}
-        >
-          <DatePicker
-            checkIn={checkIn}
-            checkOut={checkOut}
-            onCheckInChange={(d) => setCheckIn(d)}
-            onCheckOutChange={(d) => {
-              setCheckOut(d);
-              if (d) setDateOpen(false);
-            }}
-          />
         </div>,
         document.body
       )}

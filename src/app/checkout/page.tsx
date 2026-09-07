@@ -28,6 +28,12 @@ function nightsBetween(a: string, b: string): number {
   return diff > 0 ? diff : 0;
 }
 
+function defaultDate(offset: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().split("T")[0];
+}
+
 function formatDateShort(dateStr: string): { day: string; monthYear: string; weekday: string } {
   if (!dateStr) return { day: "--", monthYear: "----", weekday: "----" };
   const d = new Date(dateStr + "T00:00");
@@ -42,8 +48,8 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const pageRef = useRef<HTMLDivElement>(null);
   const roomSlug = searchParams.get("room");
-  const checkinParam = searchParams.get("checkin") || "";
-  const checkoutParam = searchParams.get("checkout") || "";
+  const checkinParam = searchParams.get("checkin") || defaultDate(1);
+  const checkoutParam = searchParams.get("checkout") || defaultDate(2);
   const adultsParam = searchParams.get("adults") || "2";
   const childrenParam = searchParams.get("children") || "0";
 

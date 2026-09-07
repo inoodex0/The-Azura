@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -154,8 +155,10 @@ const rooms = [
   },
 ];
 
-export default function RoomsPage() {
+function RoomsPageInner() {
   const pageRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const bp = `checkin=${searchParams.get("checkin") || ""}&checkout=${searchParams.get("checkout") || ""}&adults=${searchParams.get("adults") || "2"}&children=${searchParams.get("children") || "0"}&rooms=${searchParams.get("rooms") || "1"}`;
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -346,7 +349,11 @@ export default function RoomsPage() {
                             className="inline-flex items-center gap-2 border border-black/10 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
                             <Phone size={13} /> Call
                           </a>
-                          <Link href={`/checkout?room=${room.id}`}
+                          <Link href={`/rooms/${room.id}?${bp}`}
+                            className="group/btn inline-flex items-center gap-2 border border-black/10 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
+                            View Details <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-0.5" />
+                          </Link>
+                          <Link href={`/checkout?room=${room.id}&${bp}`}
                             className="group/btn inline-flex items-center gap-2 bg-[#ff784e] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-[0.1em] hover:bg-[#1a1a1a] transition-all rounded-lg">
                             Book Now <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-0.5" />
                           </Link>
@@ -391,5 +398,13 @@ export default function RoomsPage() {
       </section>
 
     </main>
+  );
+}
+
+export default function RoomsPage() {
+  return (
+    <Suspense fallback={<div />}>
+      <RoomsPageInner />
+    </Suspense>
   );
 }

@@ -103,12 +103,19 @@ export default function BookingPage() {
   const [dateOpen, setDateOpen] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [roomsOpen, setRoomsOpen] = useState(false);
-  const checkInBtnRef = useRef<HTMLButtonElement>(null);
+  const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
   const guestsBtnRef = useRef<HTMLButtonElement>(null);
   const roomsBtnRef = useRef<HTMLButtonElement>(null);
-  const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
   const [guestsPos, setGuestsPos] = useState({ top: 0, left: 0 });
   const [roomsPos, setRoomsPos] = useState({ top: 0, left: 0 });
+
+  const openDate = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setCalendarPos({ top: Math.max(8, rect.top - 420 - 4), left: Math.min(window.innerWidth - 624, rect.left) });
+    setDateOpen(!dateOpen);
+    setGuestsOpen(false);
+    setRoomsOpen(false);
+  };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -184,8 +191,7 @@ export default function BookingPage() {
               <div className="grid grid-cols-2 gap-2 sm:gap-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
 
                 <div className="relative">
-                  <button ref={checkInBtnRef} type="button"
-                    onClick={() => { if (!dateOpen && checkInBtnRef.current) { const rect = checkInBtnRef.current.getBoundingClientRect(); const calendarHeight = 420; const spaceBelow = window.innerHeight - rect.bottom; const spaceAbove = rect.top - 86; if (spaceBelow >= calendarHeight) { setCalendarPos({ top: rect.bottom + 8, left: rect.left }); } else if (spaceAbove >= calendarHeight) { setCalendarPos({ top: rect.top - calendarHeight - 8, left: rect.left }); } else { setCalendarPos({ top: 90, left: rect.left }); } } setDateOpen(!dateOpen); setGuestsOpen(false); setRoomsOpen(false); }}
+                  <button type="button" onClick={openDate}
                     className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
                     <span className="text-[#ff784e]"><CalendarDays size={16} className="sm:hidden" /><CalendarDays size={18} className="hidden sm:block" /></span>
                     <span className="flex flex-1 flex-col">
@@ -198,7 +204,7 @@ export default function BookingPage() {
                 </div>
 
                 <div className="relative">
-                  <button type="button" onClick={() => { setDateOpen(!dateOpen); setGuestsOpen(false); setRoomsOpen(false); }}
+                  <button type="button" onClick={openDate}
                     className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
                     <span className="text-[#ff784e]"><CalendarDays size={16} className="sm:hidden" /><CalendarDays size={18} className="hidden sm:block" /></span>
                     <span className="flex flex-1 flex-col">
@@ -212,7 +218,7 @@ export default function BookingPage() {
 
                 <div className="relative">
                   <button ref={guestsBtnRef} type="button"
-                    onClick={() => { if (!guestsOpen && guestsBtnRef.current) { const rect = guestsBtnRef.current.getBoundingClientRect(); setGuestsPos({ top: rect.bottom + 8, left: rect.left }); } setGuestsOpen(!guestsOpen); setRoomsOpen(false); setDateOpen(false); }}
+                    onClick={() => { if (!guestsOpen && guestsBtnRef.current) { const rect = guestsBtnRef.current.getBoundingClientRect(); setGuestsPos({ top: rect.top - 200 - 4, left: rect.left }); } setGuestsOpen(!guestsOpen); setRoomsOpen(false); setDateOpen(false); }}
                     className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
                     <span className="text-[#ff784e]"><Users size={16} className="sm:hidden" /><Users size={18} className="hidden sm:block" /></span>
                     <span className="flex flex-1 flex-col">
@@ -226,7 +232,7 @@ export default function BookingPage() {
 
                 <div className="relative">
                   <button ref={roomsBtnRef} type="button"
-                    onClick={() => { if (!roomsOpen && roomsBtnRef.current) { const rect = roomsBtnRef.current.getBoundingClientRect(); setRoomsPos({ top: rect.bottom + 8, left: rect.left }); } setRoomsOpen(!roomsOpen); setGuestsOpen(false); setDateOpen(false); }}
+                    onClick={() => { if (!roomsOpen && roomsBtnRef.current) { const rect = roomsBtnRef.current.getBoundingClientRect(); setRoomsPos({ top: rect.top - 120 - 4, left: rect.left }); } setRoomsOpen(!roomsOpen); setGuestsOpen(false); setDateOpen(false); }}
                     className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
                     <span className="text-[#ff784e]"><BedDouble size={16} className="sm:hidden" /><BedDouble size={18} className="hidden sm:block" /></span>
                     <span className="flex flex-1 flex-col">
@@ -238,7 +244,7 @@ export default function BookingPage() {
                   </button>
                 </div>
 
-                <Link href={`/rooms`}
+                <Link href={`/rooms?checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${children}&rooms=${roomsCount}`}
                   className="group flex col-span-2 w-full items-center justify-center gap-2.5 rounded-lg bg-[#ff784e] px-5 py-3.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:bg-white hover:text-black sm:text-[11px] sm:tracking-[0.12em] lg:col-span-1 lg:py-0">
                   Check Availability <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
@@ -250,15 +256,15 @@ export default function BookingPage() {
       </section>
 
       {/* Click outside */}
-      {(guestsOpen || roomsOpen || dateOpen) && (
-        <div className="fixed inset-0 z-[99]" onClick={() => { setGuestsOpen(false); setRoomsOpen(false); setDateOpen(false); }} />
+      {(dateOpen || guestsOpen || roomsOpen) && (
+        <div className="fixed inset-0 z-[99]" onClick={() => { setDateOpen(false); setGuestsOpen(false); setRoomsOpen(false); }} />
       )}
 
       {/* Calendar portal */}
       {dateOpen && typeof window !== "undefined" && createPortal(
         <div data-lenis-prevent onClick={(e) => e.stopPropagation()}
-          className="fixed z-[100] w-[calc(100vw-24px)] max-w-[600px] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
-          style={window.innerWidth >= 640 ? { top: calendarPos.top, left: calendarPos.left } : undefined}>
+          className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl w-[calc(100vw-24px)] max-w-[600px]"
+          style={{ top: calendarPos.top, left: calendarPos.left }}>
           <DatePicker checkIn={checkIn} checkOut={checkOut} onCheckInChange={(d) => setCheckIn(d)}
             onCheckOutChange={(d) => { setCheckOut(d); if (d) setDateOpen(false); }} />
         </div>, document.body
@@ -266,8 +272,8 @@ export default function BookingPage() {
 
       {/* Guests portal */}
       {guestsOpen && typeof window !== "undefined" && createPortal(
-        <div data-lenis-prevent className="fixed z-[100] w-64 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
-          style={window.innerWidth >= 640 ? { top: guestsPos.top, left: guestsPos.left } : undefined}>
+        <div data-lenis-prevent className="fixed z-[100] w-64 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{ top: guestsPos.top, left: guestsPos.left }}>
           <div className="p-4">
             <div className="flex items-center justify-between py-3">
               <span className="text-sm font-medium text-white">Adults</span>
@@ -292,8 +298,8 @@ export default function BookingPage() {
 
       {/* Rooms portal */}
       {roomsOpen && typeof window !== "undefined" && createPortal(
-        <div data-lenis-prevent className="fixed z-[100] w-52 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
-          style={window.innerWidth >= 640 ? { top: roomsPos.top, left: roomsPos.left } : undefined}>
+        <div data-lenis-prevent className="fixed z-[100] w-52 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{ top: roomsPos.top, left: roomsPos.left }}>
           <div className="p-4">
             <div className="flex items-center justify-between py-3">
               <span className="text-sm font-medium text-white">Rooms</span>
@@ -390,7 +396,7 @@ export default function BookingPage() {
                           className="hidden sm:inline-flex items-center gap-2 border border-black/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
                           <Phone size={12} /> Call
                         </a>
-                        <Link href={`/rooms/${room.id}`}
+                        <Link href={`/rooms/${room.id}?checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${children}&rooms=${roomsCount}`}
                           className="group/btn inline-flex items-center gap-2 bg-[#ff784e] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-[0.12em] hover:bg-[#1a1a1a] transition-all rounded-lg">
                           View Details <ArrowUpRight size={13} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                         </Link>
