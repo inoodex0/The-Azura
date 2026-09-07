@@ -185,7 +185,7 @@ export default function BookingPage() {
 
                 <div className="relative">
                   <button ref={checkInBtnRef} type="button"
-                    onClick={() => { if (!dateOpen && checkInBtnRef.current) { const rect = checkInBtnRef.current.getBoundingClientRect(); setCalendarPos({ top: rect.bottom + 8, left: rect.left }); } setDateOpen(!dateOpen); setGuestsOpen(false); setRoomsOpen(false); }}
+                    onClick={() => { if (!dateOpen && checkInBtnRef.current) { const rect = checkInBtnRef.current.getBoundingClientRect(); const calendarHeight = 420; const spaceBelow = window.innerHeight - rect.bottom; const spaceAbove = rect.top - 86; if (spaceBelow >= calendarHeight) { setCalendarPos({ top: rect.bottom + 8, left: rect.left }); } else if (spaceAbove >= calendarHeight) { setCalendarPos({ top: rect.top - calendarHeight - 8, left: rect.left }); } else { setCalendarPos({ top: 90, left: rect.left }); } } setDateOpen(!dateOpen); setGuestsOpen(false); setRoomsOpen(false); }}
                     className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
                     <span className="text-[#ff784e]"><CalendarDays size={16} className="sm:hidden" /><CalendarDays size={18} className="hidden sm:block" /></span>
                     <span className="flex flex-1 flex-col">

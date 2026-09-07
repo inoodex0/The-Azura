@@ -39,12 +39,30 @@ export default function Hero() {
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [roomsOpen, setRoomsOpen] = useState(false);
   const [dateOpen, setDateOpen] = useState(false);
-  const checkInBtnRef = useRef<HTMLButtonElement>(null);
+  const [calendarSide, setCalendarSide] = useState<"left" | "right">("left");
+  const [calendarFlipBelow, setCalendarFlipBelow] = useState(true);
+  const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
   const guestsBtnRef = useRef<HTMLButtonElement>(null);
   const roomsBtnRef = useRef<HTMLButtonElement>(null);
-  const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
   const [guestsPos, setGuestsPos] = useState({ top: 0, left: 0 });
   const [roomsPos, setRoomsPos] = useState({ top: 0, left: 0 });
+
+  const openCalendar = (e: React.MouseEvent, side: "left" | "right") => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const calendarH = 400;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const flip = spaceBelow < calendarH;
+    setCalendarFlipBelow(!flip);
+    setCalendarSide(side);
+    if (flip) {
+      setCalendarPos({ top: rect.top - calendarH - 8, left: side === "left" ? rect.left : rect.right - 600 });
+    } else {
+      setCalendarPos({ top: rect.bottom + 8, left: side === "left" ? rect.left : rect.right - 600 });
+    }
+    setDateOpen(!dateOpen);
+    setGuestsOpen(false);
+    setRoomsOpen(false);
+  };
 
   /* ─── GSAP entrance ─── */
   useEffect(() => {
@@ -273,74 +291,122 @@ export default function Hero() {
             {/* Top accent line */}
             <div className="h-[2px] bg-gradient-to-r from-transparent via-[#ff784e] to-transparent" />
 
-            <div className="p-2.5 sm:p-4 lg:p-5">
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
+            {/* Mobile layout */}
+            <div className="p-2.5 sm:hidden">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="relative">
+                  <button type="button"
+                    onClick={(e) => openCalendar(e, "left")}
+                    className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
+                    <CalendarDays size={15} className="text-[#ff784e] shrink-0" />
+                    <div className="flex flex-1 flex-col min-w-0">
+                      <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Check-in</span>
+                      <span className="mt-0.5 text-[12px] font-medium text-white truncate">{checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}</span>
+                    </div>
+                    <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <button type="button"
+                    onClick={(e) => openCalendar(e, "right")}
+                    className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
+                    <CalendarDays size={15} className="text-[#ff784e] shrink-0" />
+                    <div className="flex flex-1 flex-col min-w-0">
+                      <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Check-out</span>
+                      <span className="mt-0.5 text-[12px] font-medium text-white truncate">{checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}</span>
+                    </div>
+                    <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                  </button>
+                </div>
+
+                <button type="button"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    if (spaceBelow < 200) {
+                      setGuestsPos({ top: rect.top - 200, left: rect.left });
+                    } else {
+                      setGuestsPos({ top: rect.bottom + 8, left: rect.left });
+                    }
+                    setGuestsOpen(!guestsOpen);
+                    setRoomsOpen(false);
+                    setDateOpen(false);
+                  }}
+                  className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
+                  <Users size={15} className="text-[#ff784e] shrink-0" />
+                  <div className="flex flex-1 flex-col min-w-0">
+                    <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Guests</span>
+                    <span className="mt-0.5 text-[12px] font-medium text-white truncate">{adults}A, {children}C</span>
+                  </div>
+                  <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 ${guestsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                </button>
+
+                <button type="button"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    if (spaceBelow < 200) {
+                      setRoomsPos({ top: rect.top - 200, left: rect.left });
+                    } else {
+                      setRoomsPos({ top: rect.bottom + 8, left: rect.left });
+                    }
+                    setRoomsOpen(!roomsOpen);
+                    setGuestsOpen(false);
+                    setDateOpen(false);
+                  }}
+                  className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
+                  <BedDouble size={15} className="text-[#ff784e] shrink-0" />
+                  <div className="flex flex-1 flex-col min-w-0">
+                    <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Rooms</span>
+                    <span className="mt-0.5 text-[12px] font-medium text-white truncate">{rooms} Room{rooms > 1 ? "s" : ""}</span>
+                  </div>
+                  <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 ${roomsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                </button>
+              </div>
+              <Link href={`/rooms?checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${children}&rooms=${rooms}`}
+                className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#ff784e] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
+                Check Availability <ArrowUpRight size={14} />
+              </Link>
+            </div>
+
+            {/* Desktop layout */}
+            <div className="hidden sm:block p-4 lg:p-5">
+              <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
 
                 {/* Check-in Date */}
                 <div className="relative">
                   <button
-                    ref={checkInBtnRef}
                     type="button"
-                    onClick={() => {
-                      if (!dateOpen && checkInBtnRef.current) {
-                        const rect = checkInBtnRef.current.getBoundingClientRect();
-                        setCalendarPos({ top: rect.bottom + 8, left: rect.left });
-                      }
-                      setDateOpen(!dateOpen);
-                      setGuestsOpen(false);
-                      setRoomsOpen(false);
-                    }}
-                    className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5"
+                    onClick={(e) => openCalendar(e, "left")}
+                    className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.05] px-5 py-3.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08]"
                   >
-                    <span className="text-[#ff784e]"><CalendarDays size={16} className="sm:hidden" /><CalendarDays size={18} className="hidden sm:block" /></span>
+                    <span className="text-[#ff784e]"><CalendarDays size={18} /></span>
                     <span className="flex flex-1 flex-col">
-                      <span className="text-[7px] font-semibold uppercase tracking-[0.12em] text-white/40 sm:text-[9px] sm:tracking-[0.18em]">Check-in</span>
-                      <span className="mt-0.5 whitespace-nowrap text-[11px] font-medium text-white sm:mt-1 sm:text-sm">
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">Check-in</span>
+                      <span className="mt-1 whitespace-nowrap text-sm font-medium text-white">
                         {checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Select date"}
                       </span>
                     </span>
-                    <ChevronDown size={12} className={`text-white/30 transition-all duration-300 sm:hidden ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                    <ChevronDown size={14} className={`hidden text-white/30 transition-all duration-300 sm:block ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                    <ChevronDown size={14} className={`text-white/30 transition-all duration-300 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
                   </button>
-                  {dateOpen && (
-                    <div
-                      data-lenis-prevent
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute bottom-full left-0 z-[100] mb-2 w-[calc(100vw-48px)] max-w-[600px] sm:w-[600px]"
-                    >
-                      <DatePicker
-                        checkIn={checkIn}
-                        checkOut={checkOut}
-                        onCheckInChange={(d) => setCheckIn(d)}
-                        onCheckOutChange={(d) => {
-                          setCheckOut(d);
-                          if (d) setDateOpen(false);
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
 
                 {/* Check-out Date */}
                 <div className="relative">
                   <button
                     type="button"
-                    onClick={() => {
-                      setDateOpen(!dateOpen);
-                      setGuestsOpen(false);
-                      setRoomsOpen(false);
-                    }}
-                    className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5"
+                    onClick={(e) => openCalendar(e, "right")}
+                    className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.05] px-5 py-3.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08]"
                   >
-                    <span className="text-[#ff784e]"><CalendarDays size={16} className="sm:hidden" /><CalendarDays size={18} className="hidden sm:block" /></span>
+                    <span className="text-[#ff784e]"><CalendarDays size={18} /></span>
                     <span className="flex flex-1 flex-col">
-                      <span className="text-[7px] font-semibold uppercase tracking-[0.12em] text-white/40 sm:text-[9px] sm:tracking-[0.18em]">Check-out</span>
-                      <span className="mt-0.5 whitespace-nowrap text-[11px] font-medium text-white sm:mt-1 sm:text-sm">
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">Check-out</span>
+                      <span className="mt-1 whitespace-nowrap text-sm font-medium text-white">
                         {checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Select date"}
                       </span>
                     </span>
-                    <ChevronDown size={12} className={`text-white/30 transition-all duration-300 sm:hidden ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                    <ChevronDown size={14} className={`hidden text-white/30 transition-all duration-300 sm:block ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                    <ChevronDown size={14} className={`text-white/30 transition-all duration-300 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
                   </button>
                 </div>
 
@@ -415,27 +481,6 @@ export default function Hero() {
         <div className="fixed inset-0 z-[99]" onClick={() => { setGuestsOpen(false); setRoomsOpen(false); setDateOpen(false); }} />
       )}
 
-      {/* Calendar portal */}
-      {dateOpen && typeof window !== "undefined" && createPortal(
-        <div
-          data-lenis-prevent
-          onClick={(e) => e.stopPropagation()}
-          className="fixed z-[100] w-[calc(100vw-24px)] max-w-[600px] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2"
-          style={window.innerWidth >= 640 ? { top: calendarPos.top, left: calendarPos.left } : undefined}
-        >
-          <DatePicker
-            checkIn={checkIn}
-            checkOut={checkOut}
-            onCheckInChange={(d) => setCheckIn(d)}
-            onCheckOutChange={(d) => {
-              setCheckOut(d);
-              if (d) setDateOpen(false);
-            }}
-          />
-        </div>,
-        document.body
-      )}
-
       {/* Guests portal */}
       {guestsOpen && typeof window !== "undefined" && createPortal(
         <div
@@ -486,44 +531,27 @@ export default function Hero() {
         </div>,
         document.body
       )}
-    </section>
-  );
-}
 
-/* ============================================================= */
-/* BOOKING FIELD */
-/* ============================================================= */
-
-function BookingField({
-  icon,
-  label,
-  value,
-  dropdown = false,
-  className = "",
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  dropdown?: boolean;
-  className?: string;
-}) {
-  return (
-    <button
-      type="button"
-      className={`group flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.05] px-4 py-3 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:px-5 sm:py-3.5 ${className}`}
-    >
-      <span className="text-[#ff784e]">{icon}</span>
-      <span className="flex flex-1 flex-col">
-        <span className="text-[8px] font-semibold uppercase tracking-[0.15em] text-white/40 sm:text-[9px] sm:tracking-[0.18em]">
-          {label}
-        </span>
-        <span className="mt-0.5 text-xs font-medium text-white sm:mt-1 sm:text-sm">
-          {value}
-        </span>
-      </span>
-      {dropdown && (
-        <ChevronDown size={14} className="text-white/30 transition-all duration-300 group-hover:translate-y-0.5 group-hover:text-[#ff784e]" />
+      {/* Calendar portal */}
+      {dateOpen && typeof window !== "undefined" && createPortal(
+        <div
+          data-lenis-prevent
+          onClick={(e) => e.stopPropagation()}
+          className="fixed z-[100] w-[calc(100vw-24px)] max-w-[600px] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{ top: calendarPos.top, left: calendarPos.left }}
+        >
+          <DatePicker
+            checkIn={checkIn}
+            checkOut={checkOut}
+            onCheckInChange={(d) => setCheckIn(d)}
+            onCheckOutChange={(d) => {
+              setCheckOut(d);
+              if (d) setDateOpen(false);
+            }}
+          />
+        </div>,
+        document.body
       )}
-    </button>
+    </section>
   );
 }
