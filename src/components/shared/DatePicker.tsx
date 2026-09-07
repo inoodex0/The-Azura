@@ -105,26 +105,28 @@ export default function DatePicker({
   const renderMonth = (year: number, month: number) => {
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
+    const totalCells = 42;
     const days: (number | null)[] = [];
 
     for (let i = 0; i < firstDay; i++) days.push(null);
     for (let i = 1; i <= daysInMonth; i++) days.push(i);
+    while (days.length < totalCells) days.push(null);
 
     return (
       <div className="flex-1">
-        <div className="mb-3 text-center text-sm font-semibold text-white">
+        <div className="mb-2 text-center text-xs font-semibold text-white sm:mb-3 sm:text-sm">
           {leftMonthLabel === rightMonthLabel ? `${leftMonthLabel} ${leftYear}` : `${new Date(year, month).toLocaleString("en-US", { month: "short" })} ${year}`}
         </div>
         <div className="mb-1 grid grid-cols-7 gap-0">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="py-1 text-center text-[10px] font-medium uppercase tracking-wider text-white/40">
+            <div key={d} className="py-1 text-center text-[9px] font-medium uppercase tracking-wider text-white/40 sm:text-[10px]">
               {d}
             </div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-0">
           {days.map((day, i) => {
-            if (day === null) return <div key={`empty-${i}`} />;
+            if (day === null) return <div key={`empty-${i}`} className="h-8 sm:h-9" />;
 
             const dateStr = formatDate(year, month, day);
             const isPast = dateStr < todayStr;
@@ -150,7 +152,7 @@ export default function DatePicker({
                 type="button"
                 disabled={isPast}
                 onClick={() => handleDateClick(dateStr)}
-                className={`relative flex h-7 w-full items-center justify-center rounded-lg text-[11px] transition-all duration-150 sm:h-8 sm:text-xs ${bgClass}`}
+                className={`relative flex h-8 w-full items-center justify-center rounded-lg text-[11px] transition-all duration-150 sm:h-9 sm:text-xs ${bgClass}`}
               >
                 {isToday && !(isCheckIn || isCheckOut) && (
                   <span className="absolute inset-0 rounded-lg border border-[#ff784e]/40" />
@@ -166,15 +168,15 @@ export default function DatePicker({
 
   return (
     <div ref={panelRef} className="w-full rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl">
-      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3">
+      <div className="flex items-center justify-between border-b border-white/10 px-2.5 py-2 sm:px-4 sm:py-3">
         <button type="button" onClick={prevMonth} className="flex h-7 w-7 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
           <ChevronLeft size={14} />
         </button>
-        <div className="flex gap-3 text-[11px] font-medium text-white/50 sm:gap-6 sm:text-xs">
+        <div className="flex gap-2 text-[10px] font-medium text-white/50 sm:gap-6 sm:text-xs">
           <button
             type="button"
             onClick={() => setSelecting("checkin")}
-            className={`rounded-full px-2 py-0.5 transition sm:px-3 sm:py-1 ${selecting === "checkin" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
+            className={`rounded-full px-2 py-0.9 transition sm:px-3 sm:py-1 ${selecting === "checkin" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
           >
             Check-in {checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
           </button>
@@ -191,10 +193,8 @@ export default function DatePicker({
         </button>
       </div>
 
-      <div className="flex gap-0 p-4">
+      <div className="p-3 sm:p-4">
         {renderMonth(leftYear, leftMonth)}
-        <div className="mx-3 hidden w-px bg-white/10 sm:block" />
-        <div className="hidden sm:block">{renderMonth(rightYear, rightMonth)}</div>
       </div>
     </div>
   );

@@ -26,41 +26,27 @@ function computePosition(
   btnRect: DOMRect,
   dropdownHeight: number,
   dropdownWidth: number
-): { top: number; left: number } {
+): { top: number; left: number; fullWidth?: boolean } {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const gap = 6;
+  const isMobile = vw < 640;
+  const navBarHeight = 80;
 
-  const spaceBelow = vh - btnRect.bottom - gap;
-  const spaceAbove = btnRect.top - gap;
-  const spaceRight = vw - btnRect.left;
-  const spaceLeft = btnRect.left;
-
-  let top: number;
-  let left: number;
-
-  if (spaceBelow >= dropdownHeight + gap) {
-    top = btnRect.bottom + gap;
-  } else if (spaceAbove >= dropdownHeight + gap) {
-    top = btnRect.top - dropdownHeight - gap;
-  } else if (spaceAbove >= spaceBelow) {
-    top = Math.max(gap, btnRect.top - dropdownHeight - gap);
-  } else {
-    top = Math.max(gap, Math.min(btnRect.bottom + gap, vh - dropdownHeight - gap));
+  if (isMobile) {
+    const top = btnRect.top - dropdownHeight - 4;
+    if (top >= navBarHeight + 8) {
+      return { top, left: 0, fullWidth: true };
+    }
+    return { top: navBarHeight + 8, left: 0, fullWidth: true };
   }
 
-  if (spaceRight >= dropdownWidth) {
-    left = btnRect.left;
-  } else if (spaceLeft >= dropdownWidth) {
-    left = btnRect.right - dropdownWidth;
-  } else {
-    left = Math.max(gap, Math.min(btnRect.left, vw - dropdownWidth - gap));
-  }
+  const left = btnRect.left + btnRect.width / 2 - dropdownWidth / 2;
+  const top = btnRect.top - dropdownHeight - 4;
 
-  left = Math.max(gap, Math.min(left, vw - dropdownWidth - gap));
-  top = Math.max(gap, Math.min(top, vh - dropdownHeight - gap));
-
-  return { top, left };
+  return {
+    top: Math.max(navBarHeight + 10, top),
+    left: Math.max(12, Math.min(left, vw - dropdownWidth - 12)),
+  };
 }
 
 export default function Hero() {
@@ -79,16 +65,17 @@ export default function Hero() {
   const [dateOpen, setDateOpen] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [roomsOpen, setRoomsOpen] = useState(false);
-  const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
-  const [guestsPos, setGuestsPos] = useState({ top: 0, left: 0 });
-  const [roomsPos, setRoomsPos] = useState({ top: 0, left: 0 });
+  const [calendarPos, setCalendarPos] = useState<{ top: number; left: number; fullWidth?: boolean; bottom?: boolean }>({ top: 0, left: 0 });
+  const [guestsPos, setGuestsPos] = useState<{ top: number; left: number; fullWidth?: boolean; bottom?: boolean }>({ top: 0, left: 0 });
+  const [roomsPos, setRoomsPos] = useState<{ top: number; left: number; fullWidth?: boolean; bottom?: boolean }>({ top: 0, left: 0 });
 
   const closeAll = () => { setDateOpen(false); setGuestsOpen(false); setRoomsOpen(false); };
 
   const openDate = (e: React.MouseEvent) => {
     if (dateOpen) { closeAll(); return; }
     const rect = e.currentTarget.getBoundingClientRect();
-    const pos = computePosition(rect, 380, 600);
+    const isMob = window.innerWidth < 640;
+    const pos = computePosition(rect, isMob ? 320 : 400, isMob ? window.innerWidth : 420);
     setCalendarPos(pos);
     setDateOpen(true);
     setGuestsOpen(false);
@@ -168,17 +155,15 @@ export default function Hero() {
 
   const DateButton = ({ label, value }: { label: string; value: string }) => (
     <button type="button" onClick={openDate}
-      className="group flex w-full items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
-      <CalendarDays size={15} className="text-[#ff784e] shrink-0 sm:hidden" />
-      <CalendarDays size={18} className="text-[#ff784e] shrink-0 hidden sm:block" />
+      className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.04] px-4 py-3.5 text-left sm:bg-white/[0.05] sm:hover:border-white/15 sm:hover:bg-white/[0.08]">
+      <CalendarDays size={18} className="text-[#ff784e] shrink-0" />
       <div className="flex flex-1 flex-col min-w-0">
         <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35 sm:text-[9px] sm:tracking-[0.18em]">{label}</span>
         <span className="mt-0.5 text-[12px] font-medium text-white truncate sm:mt-1 sm:text-sm">
           {value ? new Date(value + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Select"}
         </span>
       </div>
-      <ChevronDown size={13} className={`text-white/25 transition-all duration-300 shrink-0 sm:hidden ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-      <ChevronDown size={14} className={`hidden text-white/30 transition-all duration-300 sm:block ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+      <ChevronDown size={14} className={`text-white/30 transition-all duration-300 shrink-0 ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
     </button>
   );
 
@@ -262,18 +247,18 @@ export default function Hero() {
       {/* ========================================================= */}
 
       <div ref={bookingRef} className="absolute bottom-0 left-0 z-20 w-full">
-        <div className="mx-auto max-w-[1500px] px-4 pb-2 sm:px-6 sm:pb-5 lg:px-10 lg:pb-8">
-          <div className="overflow-hidden rounded-xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:rounded-2xl lg:rounded-3xl">
+        <div className="mx-auto max-w-[1500px] px-3 pb-3 sm:px-6 sm:pb-5 lg:px-10 lg:pb-8">
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl lg:rounded-3xl">
             <div className="h-[2px] bg-gradient-to-r from-transparent via-[#ff784e] to-transparent" />
 
             {/* Mobile layout */}
-            <div className="p-2.5 sm:hidden">
-              <div className="grid grid-cols-2 gap-2">
+            <div className="p-3 sm:hidden">
+              <div className="grid grid-cols-2 gap-2.5">
                 <DateButton label="Check-in" value={checkIn} />
                 <DateButton label="Check-out" value={checkOut} />
                 <button type="button"
                   onClick={(e) => openGuests(e.currentTarget)}
-                  className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
+                  className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-4 py-3.5 text-left">
                   <Users size={15} className="text-[#ff784e] shrink-0" />
                   <div className="flex flex-1 flex-col min-w-0">
                     <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Guests</span>
@@ -283,7 +268,7 @@ export default function Hero() {
                 </button>
                 <button type="button"
                   onClick={(e) => openRooms(e.currentTarget)}
-                  className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-left">
+                  className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-4 py-3.5 text-left">
                   <BedDouble size={15} className="text-[#ff784e] shrink-0" />
                   <div className="flex flex-1 flex-col min-w-0">
                     <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">Rooms</span>
@@ -293,14 +278,14 @@ export default function Hero() {
                 </button>
               </div>
               <Link href={`/rooms?checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${children}&rooms=${rooms}`}
-                className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#ff784e] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
+                className="mt-2.5 flex items-center justify-center gap-2 rounded-xl bg-[#ff784e] px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
                 Check Availability <ArrowUpRight size={14} />
               </Link>
             </div>
 
             {/* Desktop layout */}
-            <div className="hidden sm:block p-4 lg:p-5">
-              <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
+            <div className="hidden sm:block p-3 lg:p-4">
+              <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] lg:items-stretch">
                 <DateButton label="Check-in" value={checkIn} />
                 <DateButton label="Check-out" value={checkOut} />
 
@@ -308,14 +293,13 @@ export default function Hero() {
                 <div className="relative">
                   <button type="button"
                     onClick={(e) => openGuests(e.currentTarget)}
-                    className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
-                    <span className="text-[#ff784e]"><Users size={16} className="sm:hidden" /><Users size={18} className="hidden sm:block" /></span>
+                    className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.05] px-5 py-3.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08]">
+                    <span className="text-[#ff784e]"><Users size={18} /></span>
                     <span className="flex flex-1 flex-col">
-                      <span className="text-[7px] font-semibold uppercase tracking-[0.12em] text-white/40 sm:text-[9px] sm:tracking-[0.18em]">Guests</span>
-                      <span className="mt-0.5 whitespace-nowrap text-[11px] font-medium text-white sm:mt-1 sm:text-sm">{adults} Adults, {children} Children</span>
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">Guests</span>
+                      <span className="mt-1 whitespace-nowrap text-sm font-medium text-white">{adults} Adults, {children} Children</span>
                     </span>
-                    <ChevronDown size={12} className={`text-white/30 transition-all duration-300 sm:hidden ${guestsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                    <ChevronDown size={14} className={`hidden text-white/30 transition-all duration-300 sm:block ${guestsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                    <ChevronDown size={14} className={`text-white/30 transition-all duration-300 ${guestsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
                   </button>
                 </div>
 
@@ -323,19 +307,18 @@ export default function Hero() {
                 <div className="relative">
                   <button type="button"
                     onClick={(e) => openRooms(e.currentTarget)}
-                    className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
-                    <span className="text-[#ff784e]"><BedDouble size={16} className="sm:hidden" /><BedDouble size={18} className="hidden sm:block" /></span>
+                    className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.05] px-5 py-3.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08]">
+                    <span className="text-[#ff784e]"><BedDouble size={18} /></span>
                     <span className="flex flex-1 flex-col">
-                      <span className="text-[7px] font-semibold uppercase tracking-[0.12em] text-white/40 sm:text-[9px] sm:tracking-[0.18em]">Rooms</span>
-                      <span className="mt-0.5 whitespace-nowrap text-[11px] font-medium text-white sm:mt-1 sm:text-sm">{rooms} Room{rooms > 1 ? "s" : ""}</span>
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">Rooms</span>
+                      <span className="mt-1 whitespace-nowrap text-sm font-medium text-white">{rooms} Room{rooms > 1 ? "s" : ""}</span>
                     </span>
-                    <ChevronDown size={12} className={`text-white/30 transition-all duration-300 sm:hidden ${roomsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
-                    <ChevronDown size={14} className={`hidden text-white/30 transition-all duration-300 sm:block ${roomsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+                    <ChevronDown size={14} className={`text-white/30 transition-all duration-300 ${roomsOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
                   </button>
                 </div>
 
                 <Link href={`/rooms?checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${children}&rooms=${rooms}`}
-                  className="group flex col-span-2 w-full items-center justify-center gap-2.5 rounded-lg bg-[#ff784e] px-5 py-3.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:bg-white hover:text-black sm:text-[11px] sm:tracking-[0.12em] lg:col-span-1 lg:py-0">
+                  className="group flex col-span-2 w-full items-center justify-center gap-2.5 rounded-xl bg-[#ff784e] px-5 py-4 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:bg-white hover:text-black lg:col-span-1 lg:py-0">
                   Check Availability
                   <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
@@ -354,19 +337,29 @@ export default function Hero() {
       {dateOpen && typeof window !== "undefined" && createPortal(
         <div data-lenis-prevent onClick={(e) => e.stopPropagation()}
           className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
-          style={{ top: calendarPos.top, left: calendarPos.left, width: "min(100vw - 24px, 600px)" }}>
+          style={{
+            top: calendarPos.top,
+            left: calendarPos.fullWidth ? 0 : calendarPos.left,
+            width: calendarPos.fullWidth ? "100vw" : "min(100vw - 24px, 600px)",
+          }}>
+          <div className="p-3 sm:p-4">
           <DatePicker checkIn={checkIn} checkOut={checkOut}
             onCheckInChange={(d) => setCheckIn(d)}
             onCheckOutChange={(d) => { setCheckOut(d); if (d) closeAll(); }} />
+          </div>
         </div>,
         document.body
       )}
 
       {/* Guests portal */}
       {guestsOpen && typeof window !== "undefined" && createPortal(
-        <div data-lenis-prevent className="fixed z-[100] w-64 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
-          style={{ top: guestsPos.top, left: guestsPos.left }}>
-          <div className="p-4">
+        <div data-lenis-prevent className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{
+            top: guestsPos.top,
+            left: guestsPos.fullWidth ? 0 : guestsPos.left,
+            width: guestsPos.fullWidth ? "100vw" : "256px",
+          }}>
+          <div className="p-5">
             <div className="flex items-center justify-between py-3">
               <span className="text-sm font-medium text-white">Adults</span>
               <div className="flex items-center gap-4">
@@ -391,9 +384,13 @@ export default function Hero() {
 
       {/* Rooms portal */}
       {roomsOpen && typeof window !== "undefined" && createPortal(
-        <div data-lenis-prevent className="fixed z-[100] w-52 overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
-          style={{ top: roomsPos.top, left: roomsPos.left }}>
-          <div className="p-4">
+        <div data-lenis-prevent className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
+          style={{
+            top: roomsPos.top,
+            left: roomsPos.fullWidth ? 0 : roomsPos.left,
+            width: roomsPos.fullWidth ? "100vw" : "208px",
+          }}>
+          <div className="p-5">
             <div className="flex items-center justify-between py-3">
               <span className="text-sm font-medium text-white">Rooms</span>
               <div className="flex items-center gap-4">
