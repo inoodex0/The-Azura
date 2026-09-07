@@ -25,7 +25,7 @@ const facilities = [
       "Take a refreshing break and unwind beside our beautifully designed infinity pool. With stunning views and a serene atmosphere, it's the perfect place to soak up the sun and let your worries drift away.",
     image: "/images/facilities/pool.webp",
     icon: Waves,
-   
+    button: "Book Now",
     link: "/booking",
     features: ["Heated Pool", "Poolside Bar", "Sun Loungers", "Towel Service"],
   },
@@ -230,12 +230,21 @@ export default function FacilitiesPage() {
                       alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
                     {/* Icon badge */}
                     <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center bg-[#ff784e] text-white">
                       <Icon size={18} />
                     </div>
+
+                    {/* Book Now button on image */}
+                    <Link
+                      href={item.link}
+                      className="absolute bottom-4 left-4 inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm text-[#1a1a1a] px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] hover:bg-[#ff784e] hover:text-white transition-all duration-300"
+                    >
+                      {item.button}
+                      <ArrowUpRight size={13} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </Link>
                   </div>
 
                   {/* Content */}
@@ -263,17 +272,6 @@ export default function FacilitiesPage() {
                         </span>
                       ))}
                     </div>
-
-                    <Link
-                      href={item.link}
-                      className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-[#1a1a1a] hover:text-[#ff784e] transition-colors"
-                    >
-                      {item.button}
-                      <ArrowUpRight
-                        size={14}
-                        className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      />
-                    </Link>
                   </div>
                 </div>
               );

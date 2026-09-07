@@ -16,100 +16,9 @@ import {
   Phone,
 } from "lucide-react";
 
-gsap.registerPlugin(ScrollTrigger);
+import { roomsData } from "@/lib/roomsData";
 
-const rooms = [
-  {
-    id: "premier-room",
-    name: "Premier Room",
-    subtitle: "Comfort Redefined",
-    tag: "Popular",
-    description: "Experience elegance in our beautifully designed Premier Room. Featuring modern amenities, plush bedding, and stunning city views, this room is perfect for both business and leisure travelers.",
-    image: "/images/room1.avif",
-    price: "7,500",
-    floor: "3rd - 5th Floor",
-    bed: "1 King Bed",
-    maxGuests: "2 Adults",
-    size: "320 sq ft",
-    stars: 4,
-    amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Room Service", "City View"],
-  },
-  {
-    id: "superior-deluxe-room",
-    name: "Superior Deluxe Room",
-    subtitle: "Spacious Luxury",
-    tag: "Best Seller",
-    description: "Our Superior Deluxe Room offers extra space and premium finishes. Enjoy the separate seating area, upgraded bathroom, and panoramic views that make your stay truly memorable.",
-    image: "/images/room2.avif",
-    price: "9,500",
-    floor: "4th - 6th Floor",
-    bed: "1 King Bed",
-    maxGuests: "2 Adults",
-    size: "400 sq ft",
-    stars: 4,
-    amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Room Service", "City View", "Seating Area"],
-  },
-  {
-    id: "executive-room",
-    name: "Executive Room",
-    subtitle: "Business Class Comfort",
-    tag: "",
-    description: "Designed for the discerning business traveler, the Executive Room combines functionality with luxury. Features a work desk, ergonomic chair, and premium connectivity.",
-    image: "/images/room3.avif",
-    price: "11,000",
-    floor: "6th - 8th Floor",
-    bed: "1 King Bed / Twin Beds",
-    maxGuests: "2 Adults",
-    size: "450 sq ft",
-    stars: 4,
-    amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Room Service", "Work Desk", "Nespresso Machine"],
-  },
-  {
-    id: "presidential-suite",
-    name: "Presidential Suite",
-    subtitle: "Ultimate Prestige",
-    tag: "Luxury",
-    description: "The pinnacle of luxury at The Azura. Our Presidential Suite features a private living room, dining area, panoramic terrace, and dedicated butler service for the most discerning guests.",
-    image: "/images/rooms/room-1.avif",
-    price: "35,000",
-    floor: "8th Floor",
-    bed: "1 King Bed",
-    maxGuests: "3 Adults",
-    size: "1200 sq ft",
-    stars: 5,
-    amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Full Bar", "Butler Service", "Panoramic Terrace", "Private Dining", "Jacuzzi"],
-  },
-  {
-    id: "premier-suite",
-    name: "Premier Suite",
-    subtitle: "Elegant Living",
-    tag: "Family",
-    description: "A generous suite with separate living and sleeping areas. Perfect for extended stays or families, the Premier Suite offers home-like comfort with hotel luxury.",
-    image: "/images/rooms/room-2.avif",
-    price: "18,000",
-    floor: "7th Floor",
-    bed: "1 King Bed",
-    maxGuests: "3 Adults",
-    size: "750 sq ft",
-    stars: 5,
-    amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Living Room", "Dining Area", "Room Service", "Sea View"],
-  },
-  {
-    id: "honeymoon-suite",
-    name: "Honeymoon Suite",
-    subtitle: "Romantic Escape",
-    tag: "Romantic",
-    description: "Crafted for love and celebration. Our Honeymoon Suite features a king-size bed with premium linens, rose petal turndown service, champagne on arrival, and breathtaking sunset views.",
-    image: "/images/rooms/room-3.avif",
-    price: "22,000",
-    floor: "7th Floor",
-    bed: "1 King Bed",
-    maxGuests: "2 Adults",
-    size: "650 sq ft",
-    stars: 5,
-    amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Full Bar", "Champagne", "Rose Turndown", "Sunset View", "Bathtub"],
-  },
-];
+gsap.registerPlugin(ScrollTrigger);
 
 function RoomsPageInner() {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -122,9 +31,11 @@ function RoomsPageInner() {
         y: 50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.2,
       });
 
-      gsap.from(".room-block", {
-        y: 60, opacity: 0, duration: 0.9, stagger: 0.15, ease: "power3.out",
-        scrollTrigger: { trigger: ".rooms-list", start: "top 80%", once: true },
+      gsap.utils.toArray<HTMLElement>(".room-block").forEach((block) => {
+        gsap.fromTo(block, { y: 60, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.9, ease: "power3.out",
+          scrollTrigger: { trigger: block, start: "top 85%", toggleActions: "play none none none" },
+        });
       });
 
       gsap.from(".stat-item", {
@@ -211,8 +122,8 @@ function RoomsPageInner() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rooms.map((room) => (
-              <div key={room.id} id={room.id} className="room-block scroll-mt-24 group overflow-hidden border border-black/[0.08] bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
+            {roomsData.map((room) => (
+              <div key={room.slug} id={room.slug} className="room-block scroll-mt-24 group overflow-hidden border border-black/[0.08] bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
                 {/* IMAGE */}
                 <div className="relative block aspect-[4/3] overflow-hidden bg-black">
                   <img src={room.image} alt={room.name} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
@@ -275,7 +186,7 @@ function RoomsPageInner() {
                         /Night (Net)
                       </span>
                     </div>
-                    <Link href={`/rooms/${room.id}?${bp}`}
+                    <Link href={`/rooms/${room.slug}?${bp}`}
                       className="group/link flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#ff784e] transition-colors hover:text-black sm:text-[12px]">
                       View Detail
                       <ArrowUpRight size={14} className="transition-transform duration-300 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />

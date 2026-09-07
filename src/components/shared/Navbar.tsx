@@ -90,7 +90,7 @@ export default function Navbar() {
 
       <nav className="border-b border-black/10 bg-white">
         <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-10">
-          <div className="flex h-[70px] items-center justify-between sm:h-[80px] lg:h-[86px]">
+          <div className="flex h-[80px] items-center justify-between sm:h-[80px] lg:h-[86px]">
 
             {/* LOGO */}
             <Link href="/" onClick={closeMobileMenu} className="group flex shrink-0 items-center gap-2 sm:gap-3">
