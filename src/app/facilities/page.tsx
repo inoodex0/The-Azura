@@ -25,7 +25,7 @@ const facilities = [
       "Take a refreshing break and unwind beside our beautifully designed infinity pool. With stunning views and a serene atmosphere, it's the perfect place to soak up the sun and let your worries drift away.",
     image: "/images/facilities/pool.webp",
     icon: Waves,
-    button: "Book Now",
+   
     link: "/booking",
     features: ["Heated Pool", "Poolside Bar", "Sun Loungers", "Towel Service"],
   },
@@ -385,9 +385,7 @@ export default function FacilitiesPage() {
             Experience world-class amenities and exceptional hospitality at The Azura.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/booking" className="group inline-flex items-center gap-2 bg-[#ff784e] text-white px-10 py-5 text-xs font-bold uppercase tracking-[0.18em] hover:bg-white hover:text-[#1a1a1a] transition-all duration-300">
-              Book Now <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+           
             <a href="tel:+8801401777888" className="inline-flex items-center gap-3 border border-white/20 text-white px-10 py-5 text-xs font-bold uppercase tracking-[0.18em] hover:border-[#ff784e] hover:text-[#ff784e] transition-all duration-300">
               Call +880 1401 777 888
             </a>

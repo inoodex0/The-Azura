@@ -13,66 +13,22 @@ import {
   Star,
   Maximize2,
 } from "lucide-react";
+import { roomsData } from "@/lib/roomsData";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const rooms = [
-  {
-    id: 1,
-    name: "Executive Couple Bed (City View)",
-    tags: ["Couple Room"],
-    image: "/images/rooms/room-1.avif",
-    price: "8,500",
-    size: "3rd floor",
-    bed: "1 bed",
-    maxGuests: "2 adults",
-    stars: 4,
-  },
-  {
-    id: 2,
-    name: "Standard Single Room",
-    tags: ["Featured", "Single Room"],
-    image: "/images/rooms/room-2.avif",
-    price: "5,000",
-    size: "2nd/3rd/5th floor",
-    bed: "1 bed",
-    maxGuests: "1 adult",
-    stars: 4,
-  },
-  {
-    id: 3,
-    name: "Standard Couple Bed (City View)",
-    tags: ["Featured", "Couple Room"],
-    image: "/images/rooms/room-3.avif",
-    price: "7,200",
-    size: "1st floor",
-    bed: "1 bed",
-    maxGuests: "2 adults",
-    stars: 4,
-  },
-  {
-    id: 4,
-    name: "Standard Triple Bed (City View)",
-    tags: ["Featured", "Twin Room"],
-    image: "/images/rooms/room-4.avif",
-    price: "10,000",
-    size: "1st floor",
-    bed: "2 beds",
-    maxGuests: "3 adults",
-    stars: 4,
-  },
-  {
-    id: 5,
-    name: "Deluxe Family Suite",
-    tags: ["Featured", "Suite"],
-    image: "/images/rooms/room-5.avif",
-    price: "15,000",
-    size: "5th floor",
-    bed: "2 beds",
-    maxGuests: "4 adults",
-    stars: 5,
-  },
-];
+const rooms = roomsData.slice(0, 5).map((r, i) => ({
+  id: i + 1,
+  slug: r.slug,
+  name: r.name,
+  tags: r.tag ? [r.tag] : [],
+  image: r.image,
+  price: r.price,
+  size: r.floor,
+  bed: r.bed,
+  maxGuests: r.maxGuests,
+  stars: r.stars,
+}));
 
 export default function FeaturedRooms() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -311,7 +267,7 @@ export default function FeaturedRooms() {
                       </span>
                     </div>
                     <Link
-                      href={`/rooms/${room.id}`}
+                      href={`/rooms/${room.slug}`}
                       className="group/link flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#ff784e] transition-colors hover:text-black sm:text-[12px]"
                     >
                       View Detail

@@ -189,11 +189,11 @@ export default function DiningPage() {
                 ))}
               </div>
 
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <Link href="/booking" className="group inline-flex items-center gap-3 border border-black/10 px-7 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#1a1a1a] hover:border-[#ff784e] hover:text-[#ff784e] transition-all duration-300">
                   View Details <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </section>

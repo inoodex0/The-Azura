@@ -25,6 +25,41 @@ import DatePicker from "@/components/shared/DatePicker";
 
 gsap.registerPlugin(ScrollTrigger);
 
+function computePosition(
+  btnRect: DOMRect,
+  dropdownHeight: number,
+  dropdownWidth: number
+): { top: number; left: number } {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const gap = 6;
+  const spaceBelow = vh - btnRect.bottom - gap;
+  const spaceAbove = btnRect.top - gap;
+  const spaceRight = vw - btnRect.left;
+  const spaceLeft = btnRect.left;
+  let top: number;
+  let left: number;
+  if (spaceBelow >= dropdownHeight + gap) {
+    top = btnRect.bottom + gap;
+  } else if (spaceAbove >= dropdownHeight + gap) {
+    top = btnRect.top - dropdownHeight - gap;
+  } else if (spaceAbove >= spaceBelow) {
+    top = Math.max(gap, btnRect.top - dropdownHeight - gap);
+  } else {
+    top = Math.max(gap, Math.min(btnRect.bottom + gap, vh - dropdownHeight - gap));
+  }
+  if (spaceRight >= dropdownWidth) {
+    left = btnRect.left;
+  } else if (spaceLeft >= dropdownWidth) {
+    left = btnRect.right - dropdownWidth;
+  } else {
+    left = Math.max(gap, Math.min(btnRect.left, vw - dropdownWidth - gap));
+  }
+  left = Math.max(gap, Math.min(left, vw - dropdownWidth - gap));
+  top = Math.max(gap, Math.min(top, vh - dropdownHeight - gap));
+  return { top, left };
+}
+
 const rooms = [
   {
     id: "executive-room-double",
@@ -111,12 +146,7 @@ export default function BookingPage() {
 
   const openDate = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const isMobile = window.innerWidth < 640;
-    if (isMobile) {
-      setCalendarPos({ top: 8, left: 12 });
-    } else {
-      setCalendarPos({ top: Math.max(8, rect.top - 420 - 4), left: Math.min(window.innerWidth - 624, rect.left) });
-    }
+    setCalendarPos(computePosition(rect, 380, 600));
     setDateOpen(!dateOpen);
     setGuestsOpen(false);
     setRoomsOpen(false);
@@ -223,7 +253,7 @@ export default function BookingPage() {
 
                 <div className="relative">
                   <button ref={guestsBtnRef} type="button"
-                    onClick={() => { if (!guestsOpen && guestsBtnRef.current) { const rect = guestsBtnRef.current.getBoundingClientRect(); setGuestsPos({ top: rect.top - 200 - 4, left: rect.left }); } setGuestsOpen(!guestsOpen); setRoomsOpen(false); setDateOpen(false); }}
+                    onClick={() => { if (!guestsOpen && guestsBtnRef.current) { setGuestsPos(computePosition(guestsBtnRef.current.getBoundingClientRect(), 200, 256)); } setGuestsOpen(!guestsOpen); setRoomsOpen(false); setDateOpen(false); }}
                     className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
                     <span className="text-[#ff784e]"><Users size={16} className="sm:hidden" /><Users size={18} className="hidden sm:block" /></span>
                     <span className="flex flex-1 flex-col">
@@ -237,7 +267,7 @@ export default function BookingPage() {
 
                 <div className="relative">
                   <button ref={roomsBtnRef} type="button"
-                    onClick={() => { if (!roomsOpen && roomsBtnRef.current) { const rect = roomsBtnRef.current.getBoundingClientRect(); setRoomsPos({ top: rect.top - 120 - 4, left: rect.left }); } setRoomsOpen(!roomsOpen); setGuestsOpen(false); setDateOpen(false); }}
+                    onClick={() => { if (!roomsOpen && roomsBtnRef.current) { setRoomsPos(computePosition(roomsBtnRef.current.getBoundingClientRect(), 120, 208)); } setRoomsOpen(!roomsOpen); setGuestsOpen(false); setDateOpen(false); }}
                     className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.05] px-3 py-2.5 text-left transition-all duration-300 hover:border-white/15 hover:bg-white/[0.08] sm:items-center sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3.5">
                     <span className="text-[#ff784e]"><BedDouble size={16} className="sm:hidden" /><BedDouble size={18} className="hidden sm:block" /></span>
                     <span className="flex flex-1 flex-col">

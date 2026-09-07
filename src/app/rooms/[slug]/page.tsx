@@ -25,8 +25,11 @@ import {
   ChevronLeft,
   ChevronRight,
   MapPin,
+  CalendarDays,
+  ChevronDown,
 } from "lucide-react";
 import { roomsData } from "@/lib/roomsData";
+import DatePicker from "@/components/shared/DatePicker";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,6 +51,7 @@ function RoomDetailInner() {
   const [adults, setAdults] = useState(Number(searchParams.get("adults")) || 2);
   const [childrenCount, setChildrenCount] = useState(Number(searchParams.get("children")) || 0);
   const [roomsCount, setRoomsCount] = useState(Number(searchParams.get("rooms")) || 1);
+  const [dateOpen, setDateOpen] = useState(false);
 
   const bookingLink = `/checkout?room=${room?.slug}&checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${childrenCount}&rooms=${roomsCount}`;
 
@@ -98,15 +102,15 @@ function RoomDetailInner() {
 
         {/* Image navigation arrows */}
         <button type="button" onClick={() => setActiveImage((p) => (p === 0 ? room.gallery.length - 1 : p - 1))}
-          className="absolute left-4 top-1/2 z-20 -translate-y-1/2 hidden sm:flex lg:left-8">
-          <div className="flex h-11 w-11 items-center justify-center border border-white/25 text-white backdrop-blur-sm transition-all hover:border-[#ff784e] hover:text-[#ff784e]">
-            <ChevronLeft size={18} />
+          className="absolute left-3 top-1/2 z-20 -translate-y-1/2 sm:left-4 lg:left-8">
+          <div className="flex h-9 w-9 items-center justify-center border border-white/25 text-white backdrop-blur-sm transition-all hover:border-[#ff784e] hover:text-[#ff784e] sm:h-11 sm:w-11">
+            <ChevronLeft size={16} />
           </div>
         </button>
         <button type="button" onClick={() => setActiveImage((p) => (p === room.gallery.length - 1 ? 0 : p + 1))}
-          className="absolute right-4 top-1/2 z-20 -translate-y-1/2 hidden sm:flex lg:right-8">
-          <div className="flex h-11 w-11 items-center justify-center border border-white/25 text-white backdrop-blur-sm transition-all hover:border-[#ff784e] hover:text-[#ff784e]">
-            <ChevronRight size={18} />
+          className="absolute right-3 top-1/2 z-20 -translate-y-1/2 sm:right-4 lg:right-8">
+          <div className="flex h-9 w-9 items-center justify-center border border-white/25 text-white backdrop-blur-sm transition-all hover:border-[#ff784e] hover:text-[#ff784e] sm:h-11 sm:w-11">
+            <ChevronRight size={16} />
           </div>
         </button>
 
@@ -233,12 +237,12 @@ function RoomDetailInner() {
 
             {/* Right — Booking Card */}
             <div>
-              <div className="room-detail-block sticky top-24 rounded-2xl border border-black/[0.06] bg-white p-6 sm:p-8 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
+              <div className="room-detail-block sticky top-24 rounded-2xl border border-black/[0.06] bg-white p-5 sm:p-8 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
                 <div className="flex items-baseline justify-between">
                   <div>
                     <span className="text-[9px] text-black/30 font-semibold uppercase tracking-[0.2em]">From</span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-serif font-light text-[#1a1a1a]">&#x09F3;{room.price}</span>
+                      <span className="text-2xl sm:text-3xl font-serif font-light text-[#1a1a1a]">&#x09F3;{room.price}</span>
                       <span className="text-[10px] text-black/30">/night</span>
                     </div>
                   </div>
@@ -249,59 +253,85 @@ function RoomDetailInner() {
                   </div>
                 </div>
 
-                <div className="my-5 h-px bg-black/5" />
+                <div className="my-4 h-px bg-black/5 sm:my-5" />
 
-                <div className="space-y-3">
+                {/* Date buttons */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setDateOpen(!dateOpen)}
+                    className="flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2.5 text-left hover:border-[#ff784e] transition-colors">
+                    <CalendarDays size={14} className="text-[#ff784e] shrink-0" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-black/40">Check-in</span>
+                      <span className="text-[11px] font-medium text-[#1a1a1a] truncate">
+                        {checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}
+                      </span>
+                    </div>
+                    <ChevronDown size={11} className={`text-black/30 shrink-0 transition-transform ${dateOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <button type="button" onClick={() => setDateOpen(!dateOpen)}
+                    className="flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2.5 text-left hover:border-[#ff784e] transition-colors">
+                    <CalendarDays size={14} className="text-[#ff784e] shrink-0" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-black/40">Check-out</span>
+                      <span className="text-[11px] font-medium text-[#1a1a1a] truncate">
+                        {checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}
+                      </span>
+                    </div>
+                    <ChevronDown size={11} className={`text-black/30 shrink-0 transition-transform ${dateOpen ? "rotate-180" : ""}`} />
+                  </button>
+                </div>
+
+                {dateOpen && (
+                  <div className="mt-3">
+                    <DatePicker
+                      checkIn={checkIn}
+                      checkOut={checkOut}
+                      onCheckInChange={setCheckIn}
+                      onCheckOutChange={(d) => { setCheckOut(d); if (d) setDateOpen(false); }}
+                    />
+                  </div>
+                )}
+
+                {/* Guests */}
+                <div className="grid grid-cols-3 gap-2 mt-3">
                   <div>
-                    <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Check-in</label>
-                    <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)}
-                      className="w-full rounded-lg border border-black/10 px-3 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors" />
+                    <label className="block text-[8px] font-bold uppercase tracking-[0.12em] text-black/40 mb-1">Adults</label>
+                    <select value={adults} onChange={(e) => setAdults(Number(e.target.value))}
+                      className="w-full rounded-lg border border-black/10 px-2 py-2 text-[11px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
+                      {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
                   </div>
                   <div>
-                    <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Check-out</label>
-                    <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)}
-                      className="w-full rounded-lg border border-black/10 px-3 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors" />
+                    <label className="block text-[8px] font-bold uppercase tracking-[0.12em] text-black/40 mb-1">Children</label>
+                    <select value={childrenCount} onChange={(e) => setChildrenCount(Number(e.target.value))}
+                      className="w-full rounded-lg border border-black/10 px-2 py-2 text-[11px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
+                      {[0,1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Adults</label>
-                      <select value={adults} onChange={(e) => setAdults(Number(e.target.value))}
-                        className="w-full rounded-lg border border-black/10 px-2 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
-                        {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Children</label>
-                      <select value={childrenCount} onChange={(e) => setChildrenCount(Number(e.target.value))}
-                        className="w-full rounded-lg border border-black/10 px-2 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
-                        {[0,1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-[0.15em] text-black/40 mb-1.5">Rooms</label>
-                      <select value={roomsCount} onChange={(e) => setRoomsCount(Number(e.target.value))}
-                        className="w-full rounded-lg border border-black/10 px-2 py-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
-                        {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
-                      </select>
-                    </div>
+                  <div>
+                    <label className="block text-[8px] font-bold uppercase tracking-[0.12em] text-black/40 mb-1">Rooms</label>
+                    <select value={roomsCount} onChange={(e) => setRoomsCount(Number(e.target.value))}
+                      className="w-full rounded-lg border border-black/10 px-2 py-2 text-[11px] text-[#1a1a1a] outline-none focus:border-[#ff784e] transition-colors">
+                      {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
                   </div>
                 </div>
 
-                <div className="my-5 h-px bg-black/5" />
+                <div className="my-4 h-px bg-black/5 sm:my-5" />
 
                 <Link href={bookingLink}
-                  className="group flex w-full items-center justify-center gap-2 bg-[#ff784e] text-white py-4 text-[11px] font-bold uppercase tracking-[0.12em] hover:bg-white hover:text-[#1a1a1a] border border-transparent hover:border-[#ff784e] transition-all rounded-lg">
+                  className="group flex w-full items-center justify-center gap-2 bg-[#ff784e] text-white py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] hover:bg-[#1a1a1a] transition-all rounded-lg sm:py-4">
                   Check Availability <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
 
                 <a href="tel:+8801401777888"
-                  className="mt-3 flex w-full items-center justify-center gap-2 border border-black/10 py-4 text-[11px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
+                  className="mt-3 flex w-full items-center justify-center gap-2 border border-black/10 py-3.5 text-[11px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg sm:py-4">
                   <Phone size={13} /> Call +880 1401 777 888
                 </a>
 
-                <p className="mt-4 text-center text-[10px] text-black/30">Free cancellation up to 24 hours before check-in</p>
+                <p className="mt-3 text-center text-[10px] text-black/30 sm:mt-4">Free cancellation up to 24 hours before check-in</p>
 
-                <div className="my-5 h-px bg-black/5" />
+                <div className="my-4 h-px bg-black/5 sm:my-5" />
 
                 <h4 className="text-[10px] font-semibold uppercase tracking-wider text-black/40 mb-3">This Room Includes</h4>
                 <div className="space-y-2.5">

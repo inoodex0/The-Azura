@@ -11,17 +11,9 @@ import {
   BedDouble,
   Users,
   Maximize2,
-  Phone,
   Star,
-  Check,
-  Wifi,
-  Tv,
-  Wind,
-  Coffee,
-  Bath,
-  Utensils,
   Sparkles,
-  ChevronRight,
+  Phone,
 } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -41,12 +33,6 @@ const rooms = [
     size: "320 sq ft",
     stars: 4,
     amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Room Service", "City View"],
-    features: [
-      { icon: Wifi, label: "Free Wi-Fi" },
-      { icon: Tv, label: "42\" LED TV" },
-      { icon: Wind, label: "Central AC" },
-      { icon: Coffee, label: "Mini Bar" },
-    ],
   },
   {
     id: "superior-deluxe-room",
@@ -62,12 +48,6 @@ const rooms = [
     size: "400 sq ft",
     stars: 4,
     amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Room Service", "City View", "Seating Area"],
-    features: [
-      { icon: Wifi, label: "Free Wi-Fi" },
-      { icon: Tv, label: "50\" LED TV" },
-      { icon: Wind, label: "Central AC" },
-      { icon: Coffee, label: "Mini Bar" },
-    ],
   },
   {
     id: "executive-room",
@@ -83,12 +63,6 @@ const rooms = [
     size: "450 sq ft",
     stars: 4,
     amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Room Service", "Work Desk", "Nespresso Machine"],
-    features: [
-      { icon: Wifi, label: "High-Speed Wi-Fi" },
-      { icon: Tv, label: "55\" Smart TV" },
-      { icon: Wind, label: "Central AC" },
-      { icon: Coffee, label: "Nespresso" },
-    ],
   },
   {
     id: "presidential-suite",
@@ -104,12 +78,6 @@ const rooms = [
     size: "1200 sq ft",
     stars: 5,
     amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Full Bar", "Butler Service", "Panoramic Terrace", "Private Dining", "Jacuzzi"],
-    features: [
-      { icon: Wifi, label: "Premium Wi-Fi" },
-      { icon: Tv, label: "65\" OLED TV" },
-      { icon: Bath, label: "Jacuzzi" },
-      { icon: Utensils, label: "Private Dining" },
-    ],
   },
   {
     id: "premier-suite",
@@ -125,12 +93,6 @@ const rooms = [
     size: "750 sq ft",
     stars: 5,
     amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Mini Bar", "Living Room", "Dining Area", "Room Service", "Sea View"],
-    features: [
-      { icon: Wifi, label: "Free Wi-Fi" },
-      { icon: Tv, label: "55\" Smart TV" },
-      { icon: Wind, label: "Central AC" },
-      { icon: Coffee, label: "Mini Bar" },
-    ],
   },
   {
     id: "honeymoon-suite",
@@ -146,12 +108,6 @@ const rooms = [
     size: "650 sq ft",
     stars: 5,
     amenities: ["Free Wi-Fi", "LED TV", "Air Conditioning", "Full Bar", "Champagne", "Rose Turndown", "Sunset View", "Bathtub"],
-    features: [
-      { icon: Wifi, label: "Free Wi-Fi" },
-      { icon: Tv, label: "50\" Smart TV" },
-      { icon: Bath, label: "Bathtub" },
-      { icon: Coffee, label: "Full Bar" },
-    ],
   },
 ];
 
@@ -254,112 +210,76 @@ function RoomsPageInner() {
             </p>
           </div>
 
-          <div className="space-y-8 lg:space-y-12">
-            {rooms.map((room, index) => (
-              <div
-                key={room.id}
-                id={room.id}
-                className="room-block scroll-mt-24 group"
-              >
-                <div className={`grid gap-0 overflow-hidden rounded-2xl border border-black/[0.04] bg-white shadow-[0_2px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-shadow duration-500 ${
-                  index % 2 === 0
-                    ? "lg:grid-cols-[1.1fr_1fr]"
-                    : "lg:grid-cols-[1fr_1.1fr]"
-                }`}>
-                  {/* Image */}
-                  <div className={`relative h-[260px] sm:h-[320px] lg:h-[460px] overflow-hidden ${index % 2 !== 0 ? "lg:order-2" : ""}`}>
-                    <img src={room.image} alt={room.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-
-                    {/* Tag */}
-                    {room.tag && (
-                      <div className="absolute top-5 left-5">
-                        <span className="px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.15em] bg-[#ff784e] text-white rounded-sm">{room.tag}</span>
-                      </div>
-                    )}
-
-                    {/* Floor badge */}
-                    <div className="absolute top-5 right-5">
-                      <span className="px-3 py-1.5 text-[8px] font-medium uppercase tracking-wider bg-black/50 text-white backdrop-blur-sm rounded-sm">{room.floor}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rooms.map((room) => (
+              <div key={room.id} id={room.id} className="room-block scroll-mt-24 group overflow-hidden border border-black/[0.08] bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
+                {/* IMAGE */}
+                <div className="relative block aspect-[4/3] overflow-hidden bg-black">
+                  <img src={room.image} alt={room.name} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-black/10 transition-all duration-500 group-hover:bg-black/25" />
+                  {room.tag && (
+                    <div className="absolute left-2 top-2 sm:left-3 sm:top-3">
+                      <span className="px-2 py-1 text-[9px] font-semibold uppercase tracking-wider sm:px-3 sm:py-1.5 sm:text-[10px] bg-[#ff784e] text-white">{room.tag}</span>
                     </div>
+                  )}
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+                    <span className="px-2 py-1 text-[8px] font-medium uppercase tracking-wider bg-black/50 text-white backdrop-blur-sm rounded-sm sm:px-3 sm:py-1.5">{room.floor}</span>
+                  </div>
+                </div>
 
-                    {/* Stars + name overlay */}
-                    <div className="absolute bottom-5 left-5 right-5">
-                      <div className="flex items-center gap-1 mb-2">
-                        {Array.from({ length: room.stars }).map((_, i) => (
-                          <Star key={i} size={11} className="fill-[#ff784e] text-[#ff784e]" />
-                        ))}
-                      </div>
-                      <h3 className="text-2xl sm:text-3xl font-serif font-light text-white leading-tight">{room.name}</h3>
-                      <p className="text-[11px] text-white/60 mt-1">{room.subtitle}</p>
+                {/* CONTENT */}
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-sm font-semibold leading-tight text-black sm:text-lg group-hover:text-[#ff784e] transition-colors">{room.name}</h3>
+                  <p className="mt-0.5 text-[11px] text-black/40">{room.subtitle}</p>
+
+                  <div className="mt-1.5 flex gap-0.5 sm:mt-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} size={12} className={`${i < room.stars ? "fill-[#ff784e] text-[#ff784e]" : "text-black/15"} sm:size-3.5`} />
+                    ))}
+                  </div>
+
+                  <div className="mt-3 space-y-2 sm:mt-4 sm:space-y-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#ff784e]/10">
+                        <Maximize2 size={13} className="text-[#ff784e]" />
+                      </span>
+                      <span className="text-[12px] font-medium text-black/70 sm:text-[13px]">
+                        Room Size: <span className="text-black/90">{room.size}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#ff784e]/10">
+                        <BedDouble size={13} className="text-[#ff784e]" />
+                      </span>
+                      <span className="text-[12px] font-medium text-black/70 sm:text-[13px]">
+                        Bed: <span className="text-black/90">{room.bed}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#ff784e]/10">
+                        <Users size={13} className="text-[#ff784e]" />
+                      </span>
+                      <span className="text-[12px] font-medium text-black/70 sm:text-[13px]">
+                        Max: <span className="text-black/90">{room.maxGuests}</span>
+                      </span>
                     </div>
                   </div>
 
-                  {/* Content */}
-                  <div className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between ${index % 2 !== 0 ? "lg:order-1" : ""}`}>
+                  {/* Price + View */}
+                  <div className="mt-4 flex items-end justify-between border-t border-black/[0.08] pt-4 sm:mt-5 sm:pt-5">
                     <div>
-                      <p className="text-[13px] text-black/50 leading-7">{room.description}</p>
-
-                      {/* Room specs */}
-                      <div className="mt-6 grid grid-cols-3 gap-3">
-                        {[
-                          { icon: BedDouble, label: room.bed },
-                          { icon: Users, label: room.maxGuests },
-                          { icon: Maximize2, label: room.size },
-                        ].map((spec) => (
-                          <div key={spec.label} className="flex flex-col items-center gap-2 rounded-xl bg-[#f7f4ef]/70 px-3 py-3 border border-[#f7f4ef]">
-                            <spec.icon size={16} className="text-[#ff784e]" />
-                            <span className="text-[9px] font-medium text-black/50 text-center leading-tight">{spec.label}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Features */}
-                      <div className="mt-5 grid grid-cols-4 gap-2">
-                        {room.features.map((f) => (
-                          <div key={f.label} className="flex flex-col items-center gap-2 rounded-xl border border-black/[0.04] bg-white p-3 hover:border-[#ff784e]/20 transition-colors">
-                            <f.icon size={18} className="text-[#ff784e]" />
-                            <span className="text-[8px] font-semibold uppercase tracking-wider text-black/40 text-center leading-tight">{f.label}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Amenities */}
-                      <div className="mt-5 flex flex-wrap gap-1.5">
-                        {room.amenities.map((a) => (
-                          <span key={a} className="flex items-center gap-1 px-2.5 py-1 text-[9px] font-medium text-[#ff784e] bg-[#ff784e]/[0.06] border border-[#ff784e]/10 rounded-full">
-                            <Check size={9} /> {a}
-                          </span>
-                        ))}
-                      </div>
+                      <span className="text-xl font-bold tracking-tight text-black sm:text-2xl">
+                        &#x09F3;{room.price}
+                      </span>
+                      <span className="ml-1 text-[10px] font-medium uppercase tracking-wide text-black/40">
+                        /Night (Net)
+                      </span>
                     </div>
-
-                    {/* Price + Actions */}
-                    <div className="mt-6 pt-5 border-t border-black/5">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
-                        <div>
-                          <span className="text-[9px] text-black/30 font-semibold uppercase tracking-[0.2em]">Starting from</span>
-                          <div className="flex items-baseline gap-1.5 mt-0.5">
-                            <span className="text-2xl sm:text-3xl font-serif font-light text-[#1a1a1a]">&#x09F3;{room.price}</span>
-                            <span className="text-[10px] text-black/30">/night</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <a href="tel:+8801401777888"
-                            className="inline-flex items-center gap-2 border border-black/10 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
-                            <Phone size={13} /> Call
-                          </a>
-                          <Link href={`/rooms/${room.id}?${bp}`}
-                            className="group/btn inline-flex items-center gap-2 border border-black/10 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
-                            View Details <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-0.5" />
-                          </Link>
-                          <Link href={`/checkout?room=${room.id}&${bp}`}
-                            className="group/btn inline-flex items-center gap-2 bg-[#ff784e] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-[0.1em] hover:bg-[#1a1a1a] transition-all rounded-lg">
-                            Book Now <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-0.5" />
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
+                    <Link href={`/rooms/${room.id}?${bp}`}
+                      className="group/link flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#ff784e] transition-colors hover:text-black sm:text-[12px]">
+                      View Detail
+                      <ArrowUpRight size={14} className="transition-transform duration-300 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
+                    </Link>
                   </div>
                 </div>
               </div>
