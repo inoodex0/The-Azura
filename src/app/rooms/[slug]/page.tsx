@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -96,7 +97,7 @@ function RoomDetailInner() {
       {/* HERO */}
       <section className="relative min-h-[55vh] flex items-end overflow-hidden pt-[86px] lg:min-h-[65vh]">
         <div className="absolute inset-0">
-          <img src={room.gallery[activeImage]} alt={room.name} className="w-full h-full object-cover transition-opacity duration-500" />
+          <Image src={room.gallery[activeImage]} alt={room.name} fill priority className="object-cover transition-opacity duration-500" sizes="100vw" unoptimized />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
 
@@ -178,8 +179,8 @@ function RoomDetailInner() {
           <div className="flex gap-2 py-3 overflow-x-auto">
             {room.gallery.map((img, i) => (
               <button key={i} type="button" onClick={() => setActiveImage(i)}
-                className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg transition-all ${i === activeImage ? "ring-2 ring-[#ff784e]" : "opacity-60 hover:opacity-100"}`}>
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                className={`relative h-20 w-28 shrink-0 overflow-hidden rounded-lg transition-all ${i === activeImage ? "ring-2 ring-[#ff784e]" : "opacity-60 hover:opacity-100"}`}>
+                <Image src={img} alt="" fill className="object-cover" sizes="112px" unoptimized />
               </button>
             ))}
           </div>
@@ -394,7 +395,7 @@ function RoomDetailInner() {
               <Link key={r.slug} href={`/rooms/${r.slug}`}
                 className="group block overflow-hidden rounded-xl border border-black/[0.04] bg-white shadow-sm hover:shadow-lg transition-all duration-500">
                 <div className="relative h-[200px] overflow-hidden">
-                  <img src={r.image} alt={r.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <Image src={r.image} alt={r.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" unoptimized />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   {r.tag && (
                     <span className="absolute top-3 left-3 px-2.5 py-1 text-[8px] font-bold uppercase tracking-wider bg-[#ff784e] text-white rounded-sm">{r.tag}</span>

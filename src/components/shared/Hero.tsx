@@ -23,52 +23,87 @@ const slides = [
 ];
 
 const NAV_HEIGHT = 80;
-const GAP = 8;
+const GAP = 10;
+
+interface DropdownPos {
+  top?: number;
+  bottom?: number;
+  left: number;
+  maxHeight?: number;
+}
 
 function computeDropdownPos(
   triggerRect: DOMRect,
   dropdownHeight: number,
   dropdownWidth: number,
-  containerTop?: number
-): { top: number; left: number } {
+  containerRect?: DOMRect
+): DropdownPos {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const isMobile = vw < 640;
 
-  let top: number;
-  const left = isMobile ? (vw - dropdownWidth) / 2 : triggerRect.left + triggerRect.width / 2 - dropdownWidth / 2;
+  const targetTop = containerRect ? containerRect.top : triggerRect.top;
+  const targetBottom = containerRect ? containerRect.bottom : triggerRect.bottom;
+  const spaceAbove = targetTop - GAP - NAV_HEIGHT;
+  const spaceBelow = vh - targetBottom - GAP;
+
+  let left: number;
 
   if (isMobile) {
-    const aboveContainer = containerTop != null ? containerTop - dropdownHeight - GAP : triggerRect.top - dropdownHeight - GAP;
-    const spaceAboveNav = aboveContainer - NAV_HEIGHT;
+    left = Math.max(12, (vw - dropdownWidth) / 2);
 
-    if (spaceAboveNav >= 0) {
-      top = aboveContainer;
+    if (spaceAbove >= dropdownHeight) {
+      return {
+        bottom: vh - targetTop + GAP,
+        left,
+        maxHeight: spaceAbove,
+      };
+    } else if (spaceBelow >= dropdownHeight) {
+      return {
+        top: targetBottom + GAP,
+        left,
+        maxHeight: spaceBelow,
+      };
     } else {
-      const belowTrigger = triggerRect.bottom + GAP;
-      if (belowTrigger + dropdownHeight <= vh - 10) {
-        top = belowTrigger;
-      } else {
-        top = NAV_HEIGHT + GAP;
-      }
+      const maxH = Math.min(dropdownHeight, vh - NAV_HEIGHT - 24);
+      const centeredTop = Math.max(NAV_HEIGHT + 8, Math.min((vh - maxH) / 2, vh - maxH - 12));
+      return {
+        top: centeredTop,
+        left,
+        maxHeight: maxH,
+      };
     }
   } else {
-    const spaceBelow = vh - triggerRect.bottom - GAP;
-    const spaceAbove = triggerRect.top - NAV_HEIGHT - GAP;
+    // Desktop & Laptop
+    left = triggerRect.left + triggerRect.width / 2 - dropdownWidth / 2;
+    const clampedLeft = Math.max(16, Math.min(left, vw - dropdownWidth - 16));
 
-    if (spaceBelow >= dropdownHeight) {
-      top = triggerRect.bottom + GAP;
-    } else if (spaceAbove >= dropdownHeight) {
-      top = triggerRect.top - dropdownHeight - GAP;
+    if (spaceAbove >= dropdownHeight) {
+      return {
+        bottom: vh - targetTop + GAP,
+        left: clampedLeft,
+        maxHeight: spaceAbove,
+      };
+    } else if (spaceBelow >= dropdownHeight) {
+      return {
+        top: targetBottom + GAP,
+        left: clampedLeft,
+        maxHeight: spaceBelow,
+      };
+    } else if (spaceAbove >= spaceBelow) {
+      return {
+        bottom: vh - targetTop + GAP,
+        left: clampedLeft,
+        maxHeight: Math.max(160, spaceAbove),
+      };
     } else {
-      top = NAV_HEIGHT + GAP;
+      return {
+        top: targetBottom + GAP,
+        left: clampedLeft,
+        maxHeight: Math.max(160, spaceBelow),
+      };
     }
   }
-
-  return {
-    top: Math.max(NAV_HEIGHT + GAP, Math.min(top, vh - dropdownHeight - GAP)),
-    left: Math.max(GAP, Math.min(left, vw - dropdownWidth - GAP)),
-  };
 }
 
 export default function Hero() {
@@ -87,20 +122,20 @@ export default function Hero() {
   const [dateOpen, setDateOpen] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [roomsOpen, setRoomsOpen] = useState(false);
-  const [calendarPos, setCalendarPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-  const [guestsPos, setGuestsPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-  const [roomsPos, setRoomsPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [calendarPos, setCalendarPos] = useState<DropdownPos>({ left: 0 });
+  const [guestsPos, setGuestsPos] = useState<DropdownPos>({ left: 0 });
+  const [roomsPos, setRoomsPos] = useState<DropdownPos>({ left: 0 });
 
   const closeAll = () => { setDateOpen(false); setGuestsOpen(false); setRoomsOpen(false); };
 
-  const getBookingTop = () => bookingRef.current?.getBoundingClientRect().top ?? 0;
+  const getBookingRect = () => bookingRef.current?.getBoundingClientRect();
 
   const openDate = (e: React.MouseEvent) => {
     if (dateOpen) { closeAll(); return; }
     const rect = e.currentTarget.getBoundingClientRect();
     const isMob = window.innerWidth < 640;
-    const calWidth = isMob ? Math.min(300, window.innerWidth - 32) : 520;
-    const pos = computeDropdownPos(rect, isMob ? 320 : 400, calWidth, getBookingTop());
+    const calWidth = isMob ? Math.min(340, window.innerWidth - 24) : 520;
+    const pos = computeDropdownPos(rect, isMob ? 340 : 400, calWidth, getBookingRect());
     setCalendarPos(pos);
     setDateOpen(true);
     setGuestsOpen(false);
@@ -111,7 +146,8 @@ export default function Hero() {
     if (guestsOpen) { closeAll(); return; }
     const rect = btn.getBoundingClientRect();
     const isMob = window.innerWidth < 640;
-    const pos = computeDropdownPos(rect, 180, isMob ? 220 : 280, getBookingTop());
+    const guestsWidth = isMob ? Math.min(280, window.innerWidth - 24) : 280;
+    const pos = computeDropdownPos(rect, 140, guestsWidth, getBookingRect());
     setGuestsPos(pos);
     setGuestsOpen(true);
     setRoomsOpen(false);
@@ -122,7 +158,8 @@ export default function Hero() {
     if (roomsOpen) { closeAll(); return; }
     const rect = btn.getBoundingClientRect();
     const isMob = window.innerWidth < 640;
-    const pos = computeDropdownPos(rect, 100, isMob ? 180 : 240, getBookingTop());
+    const roomsWidth = isMob ? Math.min(240, window.innerWidth - 24) : 240;
+    const pos = computeDropdownPos(rect, 90, roomsWidth, getBookingRect());
     setRoomsPos(pos);
     setRoomsOpen(true);
     setGuestsOpen(false);
@@ -365,12 +402,12 @@ export default function Hero() {
         <div data-lenis-prevent onClick={(e) => e.stopPropagation()}
           className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
           style={{
-            top: calendarPos.top,
+            ...(calendarPos.bottom != null ? { bottom: calendarPos.bottom } : { top: calendarPos.top }),
             left: calendarPos.left,
-            width: window.innerWidth < 640 ? Math.min(300, window.innerWidth - 32) : "min(520px, 100vw - 24px)",
-            maxHeight: window.innerWidth < 640 ? "min(320px, calc(100vh - 160px))" : "min(400px, calc(100vh - 160px))",
+            width: window.innerWidth < 640 ? "min(340px, calc(100vw - 24px))" : "min(520px, calc(100vw - 32px))",
+            maxHeight: calendarPos.maxHeight ?? (window.innerWidth < 640 ? "min(380px, calc(100dvh - 100px))" : "min(420px, calc(100vh - 120px))"),
           }}>
-          <div className="overflow-y-auto p-3 sm:p-4">
+          <div className="overflow-y-auto">
             <DatePicker checkIn={checkIn} checkOut={checkOut}
               onCheckInChange={(d) => setCheckIn(d)}
               onCheckOutChange={(d) => { setCheckOut(d); if (d) closeAll(); }} />
@@ -384,9 +421,9 @@ export default function Hero() {
         <div data-lenis-prevent
           className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
           style={{
-            top: guestsPos.top,
+            ...(guestsPos.bottom != null ? { bottom: guestsPos.bottom } : { top: guestsPos.top }),
             left: guestsPos.left,
-            width: window.innerWidth < 640 ? 220 : 280,
+            width: window.innerWidth < 640 ? "min(280px, calc(100vw - 24px))" : 280,
           }}>
           <div className="p-4 sm:p-5">
             <div className="flex items-center justify-between py-2.5">
@@ -416,9 +453,9 @@ export default function Hero() {
         <div data-lenis-prevent
           className="fixed z-[100] overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl"
           style={{
-            top: roomsPos.top,
+            ...(roomsPos.bottom != null ? { bottom: roomsPos.bottom } : { top: roomsPos.top }),
             left: roomsPos.left,
-            width: window.innerWidth < 640 ? 180 : 240,
+            width: window.innerWidth < 640 ? "min(240px, calc(100vw - 24px))" : 240,
           }}>
           <div className="p-4 sm:p-5">
             <div className="flex items-center justify-between py-2.5">
