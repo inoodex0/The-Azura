@@ -135,8 +135,8 @@ export default function Hero() {
     if (dateOpen && dateMode === mode) { closeAll(); return; }
     const rect = e.currentTarget.getBoundingClientRect();
     const isMob = window.innerWidth < 640;
-    const calWidth = isMob ? Math.min(340, window.innerWidth - 24) : 520;
-    const pos = computeDropdownPos(rect, isMob ? 340 : 400, calWidth, getBookingRect());
+    const calWidth = isMob ? Math.min(280, window.innerWidth - 24) : 520;
+    const pos = computeDropdownPos(rect, isMob ? 300 : 400, calWidth, getBookingRect());
     setDateMode(mode);
     setCalendarPos(pos);
     setDateOpen(true);
@@ -406,7 +406,7 @@ export default function Hero() {
           style={{
             ...(calendarPos.bottom != null ? { bottom: calendarPos.bottom } : { top: calendarPos.top }),
             left: calendarPos.left,
-            width: window.innerWidth < 640 ? "min(340px, calc(100vw - 24px))" : "min(520px, calc(100vw - 32px))",
+            width: window.innerWidth < 640 ? "min(280px, calc(100vw - 24px))" : "min(520px, calc(100vw - 32px))",
             maxHeight: calendarPos.maxHeight ?? (window.innerWidth < 640 ? "min(380px, calc(100dvh - 100px))" : "min(420px, calc(100vh - 120px))"),
           }}>
           <div className="overflow-y-auto">

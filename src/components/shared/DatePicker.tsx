@@ -106,36 +106,36 @@ export default function DatePicker({
 
   return (
     <div className="w-full rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl">
-      <div className="flex items-center justify-between border-b border-white/10 px-2.5 py-2 sm:px-4 sm:py-3">
-        <button type="button" onClick={prevMonth} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
-          <ChevronLeft size={14} />
+      <div className="flex items-center justify-between border-b border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">
+        <button type="button" onClick={prevMonth} className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-7 sm:w-7">
+          <ChevronLeft size={12} />
         </button>
 
-        <div className="flex items-center justify-center text-[10px] font-medium sm:text-xs">
-          <span className="rounded-full bg-[#ff784e] px-3 py-1 font-semibold text-white shadow-sm">
+        <div className="flex items-center justify-center text-[9px] font-medium sm:text-[10px]">
+          <span className="rounded-full bg-[#ff784e] px-2.5 py-0.5 font-semibold text-white shadow-sm">
             {label} {activeDate ? new Date(activeDate + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}
           </span>
         </div>
 
-        <button type="button" onClick={nextMonth} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
-          <ChevronRight size={14} />
+        <button type="button" onClick={nextMonth} className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-7 sm:w-7">
+          <ChevronRight size={12} />
         </button>
       </div>
 
-      <div className="p-3 sm:p-4">
-        <div className="mb-2 text-center text-xs font-semibold text-white sm:mb-3 sm:text-sm">
+      <div className="p-2 sm:p-3">
+        <div className="mb-1.5 text-center text-xs font-semibold text-white sm:mb-3 sm:text-sm">
           {monthLabel} {year}
         </div>
         <div className="mb-1 grid grid-cols-7 gap-0">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="py-1 text-center text-[9px] font-medium uppercase tracking-wider text-white/40 sm:text-[10px]">
+            <div key={d} className="py-0.5 text-center text-[8px] font-medium uppercase tracking-wider text-white/40 sm:text-[9px]">
               {d}
             </div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-0">
           {days.map((day, i) => {
-            if (day === null) return <div key={`empty-${i}`} className="h-8 sm:h-9" />;
+            if (day === null) return <div key={`empty-${i}`} className="h-7 sm:h-8" />;
 
             const dateStr = formatDate(year, month, day);
             const isPast = dateStr < todayStr;
@@ -164,7 +164,7 @@ export default function DatePicker({
                 type="button"
                 disabled={Boolean(isDisabled)}
                 onClick={() => handleDateClick(dateStr)}
-                className={`relative flex h-8 w-full items-center justify-center rounded-lg text-[11px] transition-all duration-150 sm:h-9 sm:text-xs ${bgClass}`}
+                className={`relative flex h-7 w-full items-center justify-center rounded-lg text-[10px] transition-all duration-150 sm:h-8 sm:text-[11px] ${bgClass}`}
               >
                 {isToday && !isActive && (
                   <span className="absolute inset-0 rounded-lg border border-[#ff784e]/40" />
