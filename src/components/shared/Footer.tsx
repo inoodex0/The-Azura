@@ -34,17 +34,11 @@ export default function Footer() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".footer-reveal", {
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: "top 85%",
-          once: true,
-        },
+      gsap.utils.toArray<HTMLElement>(".footer-reveal").forEach((el) => {
+        gsap.fromTo(el, { y: 40, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.8, ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 95%", toggleActions: "play none none none" },
+        });
       });
     }, footerRef);
 

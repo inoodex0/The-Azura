@@ -142,7 +142,7 @@ export default function AboutPage() {
                 </p>
                 <p className="flex items-center gap-3 text-sm text-black/60">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ff784e] text-white text-[10px] font-bold">✓</span>
-                  Book Online and get more Discount — <Link href="/booking" className="font-bold text-[#1a1a1a] hover:text-[#ff784e] transition">BOOK HERE</Link>
+                  Book Online for exclusive discounts
                 </p>
               </div>
             </div>

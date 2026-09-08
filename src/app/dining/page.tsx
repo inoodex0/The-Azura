@@ -274,7 +274,7 @@ export default function DiningPage() {
                 <p className="text-black/40 text-[12px]">Tel: +880 1401 777 888</p>
                 <p className="text-black/40 text-[12px]">Email: reservation@theazura.com</p>
               </div>
-              <Link href="/booking" className="mt-7 inline-flex items-center gap-3 border border-black/10 px-7 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#1a1a1a] hover:border-[#ff784e] hover:text-[#ff784e] transition-all duration-300">
+              <Link href="/booking" className="mt-7 inline-flex items-center gap-3 border border-black/10 px-7 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#1a1a1a] hover:border-black hover:text-white transition-all duration-300">
                 Reserve Your Stay <ArrowUpRight size={14} />
               </Link>
             </div>

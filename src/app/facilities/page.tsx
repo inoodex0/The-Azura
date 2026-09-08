@@ -5,8 +5,6 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  ArrowRight,
-  ArrowUpRight,
   Waves,
   Utensils,
   Sparkles,
@@ -25,8 +23,6 @@ const facilities = [
       "Take a refreshing break and unwind beside our beautifully designed infinity pool. With stunning views and a serene atmosphere, it's the perfect place to soak up the sun and let your worries drift away.",
     image: "/images/facilities/pool.webp",
     icon: Waves,
-    button: "Book Now",
-    link: "/booking",
     features: ["Heated Pool", "Poolside Bar", "Sun Loungers", "Towel Service"],
   },
   {
@@ -36,8 +32,6 @@ const facilities = [
       "Enjoy carefully crafted dishes prepared with the freshest local ingredients. Our signature restaurant offers an international menu featuring everything from traditional delicacies to global cuisines.",
     image: "/images/facilities/dining.avif",
     icon: Utensils,
-    button: "Book Now",
-    link: "/booking",
     features: ["International Menu", "Private Dining", "Wine Collection", "Ocean View"],
   },
   {
@@ -47,8 +41,6 @@ const facilities = [
       "Restore your body and mind with our world-class wellness experience. Our authentic spa offers the perfect retreat — be it to heal, pamper, rejuvenate or revitalize, rest assured your desires will be met.",
     image: "/images/facilities/spa.avif",
     icon: Sparkles,
-    button: "Book Now",
-    link: "/booking",
     features: ["Couples Treatment", "Steam Room", "Sauna", "Hot Tub"],
   },
   {
@@ -58,8 +50,6 @@ const facilities = [
       "Stay active with state-of-the-art equipment available throughout your stay. Our modern fitness center features everything you need to maintain your workout routine while enjoying your vacation.",
     image: "/images/facilities/gym.webp",
     icon: Dumbbell,
-    button: "Book Now",
-    link: "/booking",
     features: ["Modern Equipment", "Personal Trainers", "Yoga Studio", "24/7 Access"],
   },
   {
@@ -69,8 +59,6 @@ const facilities = [
       "Secure and convenient parking for a worry-free arrival. Our private parking area is monitored 24/7 to ensure your vehicle stays safe throughout your stay at The Azura.",
     image: "/images/facilities/parking.jpg",
     icon: Car,
-    button: "Book Now",
-    link: "/booking",
     features: ["24/7 Security", "CCTV Monitored", "Covered Parking", "Valet Service"],
   },
   {
@@ -80,8 +68,6 @@ const facilities = [
       "Stay connected with reliable high-speed Wi-Fi throughout the hotel. Whether for business or leisure, enjoy seamless internet access in every corner of The Azura.",
     image: "/images/facilities/wifi.avif",
     icon: Wifi,
-    button: "Book Now",
-    link: "/booking",
     features: ["Fiber Optic", "Room Service", "Business Center", "No Data Limits"],
   },
 ];
@@ -237,14 +223,6 @@ export default function FacilitiesPage() {
                       <Icon size={18} />
                     </div>
 
-                    {/* Book Now button on image */}
-                    <Link
-                      href={item.link}
-                      className="absolute bottom-4 left-4 inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm text-[#1a1a1a] px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] hover:bg-[#ff784e] hover:text-white transition-all duration-300"
-                    >
-                      {item.button}
-                      <ArrowUpRight size={13} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </Link>
                   </div>
 
                   {/* Content */}
@@ -344,17 +322,6 @@ export default function FacilitiesPage() {
                         </div>
                       ))}
                     </div>
-
-                    <Link
-                      href={item.link}
-                      className="group mt-8 inline-flex items-center gap-3 bg-[#ff784e] text-white px-8 py-4 text-xs font-bold uppercase tracking-[0.15em] hover:bg-[#e86a3e] transition-all duration-300"
-                    >
-                      {item.button}
-                      <ArrowRight
-                        size={16}
-                        className="group-hover:translate-x-1 transition-transform"
-                      />
-                    </Link>
                   </div>
                 </div>
 
