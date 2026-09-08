@@ -120,6 +120,7 @@ export default function Hero() {
   const [children, setChildren] = useState(0);
   const [rooms, setRooms] = useState(1);
   const [dateOpen, setDateOpen] = useState(false);
+  const [dateMode, setDateMode] = useState<"checkin" | "checkout">("checkin");
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [roomsOpen, setRoomsOpen] = useState(false);
   const [calendarPos, setCalendarPos] = useState<DropdownPos>({ left: 0 });
@@ -130,12 +131,13 @@ export default function Hero() {
 
   const getBookingRect = () => bookingRef.current?.getBoundingClientRect();
 
-  const openDate = (e: React.MouseEvent) => {
-    if (dateOpen) { closeAll(); return; }
+  const openDate = (e: React.MouseEvent, mode: "checkin" | "checkout") => {
+    if (dateOpen && dateMode === mode) { closeAll(); return; }
     const rect = e.currentTarget.getBoundingClientRect();
     const isMob = window.innerWidth < 640;
     const calWidth = isMob ? Math.min(340, window.innerWidth - 24) : 520;
     const pos = computeDropdownPos(rect, isMob ? 340 : 400, calWidth, getBookingRect());
+    setDateMode(mode);
     setCalendarPos(pos);
     setDateOpen(true);
     setGuestsOpen(false);
@@ -217,8 +219,8 @@ export default function Hero() {
     }
   }, [dateOpen, guestsOpen, roomsOpen]);
 
-  const DateButton = ({ label, value }: { label: string; value: string }) => (
-    <button type="button" onClick={openDate}
+  const DateButton = ({ label, value, mode }: { label: string; value: string; mode: "checkin" | "checkout" }) => (
+    <button type="button" onClick={(e) => openDate(e, mode)}
       className="group flex w-full items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.04] px-3 py-2.5 text-left sm:rounded-xl sm:border-white/[0.07] sm:bg-white/[0.05] sm:px-5 sm:py-3.5 sm:hover:border-white/15 sm:hover:bg-white/[0.08]">
       <CalendarDays size={15} className="text-[#ff784e] shrink-0 sm:size-[18]" />
       <div className="flex flex-1 flex-col min-w-0">
@@ -227,7 +229,7 @@ export default function Hero() {
           {value ? new Date(value + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Select"}
         </span>
       </div>
-      <ChevronDown size={12} className={`text-white/30 transition-all duration-300 shrink-0 sm:size-[14] ${dateOpen ? "rotate-180 text-[#ff784e]" : ""}`} />
+      <ChevronDown size={12} className={`text-white/30 transition-all duration-300 shrink-0 sm:size-[14] ${dateOpen && dateMode === mode ? "rotate-180 text-[#ff784e]" : ""}`} />
     </button>
   );
 
@@ -318,8 +320,8 @@ export default function Hero() {
             {/* Mobile layout — compact */}
             <div className="p-2 sm:hidden">
               <div className="grid grid-cols-2 gap-1.5">
-                <DateButton label="Check-in" value={checkIn} />
-                <DateButton label="Check-out" value={checkOut} />
+                <DateButton label="Check-in" value={checkIn} mode="checkin" />
+                <DateButton label="Check-out" value={checkOut} mode="checkout" />
                 <button type="button"
                   onClick={(e) => openGuests(e.currentTarget)}
                   className="flex items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.04] px-3 py-2.5 text-left">
@@ -350,8 +352,8 @@ export default function Hero() {
             {/* Desktop layout */}
             <div className="hidden sm:block p-3 lg:p-4">
               <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] lg:items-stretch">
-                <DateButton label="Check-in" value={checkIn} />
-                <DateButton label="Check-out" value={checkOut} />
+                <DateButton label="Check-in" value={checkIn} mode="checkin" />
+                <DateButton label="Check-out" value={checkOut} mode="checkout" />
 
                 {/* Guests */}
                 <div className="relative">
@@ -408,9 +410,19 @@ export default function Hero() {
             maxHeight: calendarPos.maxHeight ?? (window.innerWidth < 640 ? "min(380px, calc(100dvh - 100px))" : "min(420px, calc(100vh - 120px))"),
           }}>
           <div className="overflow-y-auto">
-            <DatePicker checkIn={checkIn} checkOut={checkOut}
-              onCheckInChange={(d) => setCheckIn(d)}
-              onCheckOutChange={(d) => { setCheckOut(d); if (d) closeAll(); }} />
+            <DatePicker
+              checkIn={checkIn}
+              checkOut={checkOut}
+              mode={dateMode}
+              onCheckInChange={(d) => {
+                setCheckIn(d);
+                closeAll();
+              }}
+              onCheckOutChange={(d) => {
+                setCheckOut(d);
+                if (d) closeAll();
+              }}
+            />
           </div>
         </div>,
         document.body

@@ -56,6 +56,7 @@ function RoomDetailInner() {
   const [childrenCount, setChildrenCount] = useState(Number(searchParams.get("children")) || 0);
   const [roomsCount, setRoomsCount] = useState(Number(searchParams.get("rooms")) || 1);
   const [dateOpen, setDateOpen] = useState(false);
+  const [dateMode, setDateMode] = useState<"checkin" | "checkout">("checkin");
 
   const bookingLink = `/checkout?room=${room?.slug}&checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${childrenCount}&rooms=${roomsCount}`;
 
@@ -421,7 +422,14 @@ function RoomDetailInner() {
 
                 {/* Date buttons */}
                 <div className="grid grid-cols-2 gap-2">
-                  <button type="button" onClick={() => setDateOpen(!dateOpen)}
+                  <button type="button" onClick={() => {
+                    if (dateOpen && dateMode === "checkin") {
+                      setDateOpen(false);
+                    } else {
+                      setDateMode("checkin");
+                      setDateOpen(true);
+                    }
+                  }}
                     className="flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2.5 text-left hover:border-[#ff784e] transition-colors">
                     <CalendarDays size={14} className="text-[#ff784e] shrink-0" />
                     <div className="flex flex-col min-w-0">
@@ -430,9 +438,16 @@ function RoomDetailInner() {
                         {checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}
                       </span>
                     </div>
-                    <ChevronDown size={11} className={`text-black/30 shrink-0 transition-transform ${dateOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown size={11} className={`ml-auto text-black/30 shrink-0 transition-transform ${dateOpen && dateMode === "checkin" ? "rotate-180 text-[#ff784e]" : ""}`} />
                   </button>
-                  <button type="button" onClick={() => setDateOpen(!dateOpen)}
+                  <button type="button" onClick={() => {
+                    if (dateOpen && dateMode === "checkout") {
+                      setDateOpen(false);
+                    } else {
+                      setDateMode("checkout");
+                      setDateOpen(true);
+                    }
+                  }}
                     className="flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2.5 text-left hover:border-[#ff784e] transition-colors">
                     <CalendarDays size={14} className="text-[#ff784e] shrink-0" />
                     <div className="flex flex-col min-w-0">
@@ -441,7 +456,7 @@ function RoomDetailInner() {
                         {checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}
                       </span>
                     </div>
-                    <ChevronDown size={11} className={`text-black/30 shrink-0 transition-transform ${dateOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown size={11} className={`ml-auto text-black/30 shrink-0 transition-transform ${dateOpen && dateMode === "checkout" ? "rotate-180 text-[#ff784e]" : ""}`} />
                   </button>
                 </div>
 
@@ -450,8 +465,15 @@ function RoomDetailInner() {
                     <DatePicker
                       checkIn={checkIn}
                       checkOut={checkOut}
-                      onCheckInChange={setCheckIn}
-                      onCheckOutChange={(d) => { setCheckOut(d); if (d) setDateOpen(false); }}
+                      mode={dateMode}
+                      onCheckInChange={(d) => {
+                        setCheckIn(d);
+                        setDateOpen(false);
+                      }}
+                      onCheckOutChange={(d) => {
+                        setCheckOut(d);
+                        if (d) setDateOpen(false);
+                      }}
                     />
                   </div>
                 )}

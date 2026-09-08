@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface DatePickerProps {
@@ -8,7 +8,7 @@ interface DatePickerProps {
   checkOut: string;
   onCheckInChange: (date: string) => void;
   onCheckOutChange: (date: string) => void;
-  singleMonth?: boolean;
+  mode?: "checkin" | "checkout";
 }
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -28,10 +28,6 @@ function formatDate(year: number, month: number, day: number) {
   return `${year}-${m}-${d}`;
 }
 
-function isDateBefore(a: string, b: string) {
-  return a && b && a < b;
-}
-
 function isSameDate(a: string, b: string) {
   return a && b && a === b;
 }
@@ -46,76 +42,89 @@ export default function DatePicker({
   checkOut,
   onCheckInChange,
   onCheckOutChange,
+  mode = "checkin",
 }: DatePickerProps) {
   const today = useMemo(() => {
     const d = new Date();
     return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
   }, []);
 
-  const [leftMonth, setLeftMonth] = useState(today.month);
-  const [leftYear, setLeftYear] = useState(today.year);
-  const [selecting, setSelecting] = useState<"checkin" | "checkout">("checkin");
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  const rightMonth = leftMonth === 11 ? 0 : leftMonth + 1;
-  const rightYear = leftMonth === 11 ? leftYear + 1 : leftYear;
-
-  const rightMonthLabel = new Date(rightYear, rightMonth).toLocaleString("en-US", { month: "short" });
-  const leftMonthLabel = new Date(leftYear, leftMonth).toLocaleString("en-US", { month: "short" });
+  const [month, setMonth] = useState(today.month);
+  const [year, setYear] = useState(today.year);
 
   const todayStr = formatDate(today.year, today.month, today.day);
 
   const prevMonth = () => {
-    if (leftMonth === 0) {
-      setLeftMonth(11);
-      setLeftYear(leftYear - 1);
+    if (month === 0) {
+      setMonth(11);
+      setYear(year - 1);
     } else {
-      setLeftMonth(leftMonth - 1);
+      setMonth(month - 1);
     }
   };
 
   const nextMonth = () => {
-    if (leftMonth === 11) {
-      setLeftMonth(0);
-      setLeftYear(leftYear + 1);
+    if (month === 11) {
+      setMonth(0);
+      setYear(year + 1);
     } else {
-      setLeftMonth(leftMonth + 1);
+      setMonth(month + 1);
     }
   };
 
   const handleDateClick = (dateStr: string) => {
     if (dateStr < todayStr) return;
 
-    if (selecting === "checkin") {
+    if (mode === "checkin") {
       onCheckInChange(dateStr);
-      onCheckOutChange("");
-      setSelecting("checkout");
+      if (checkOut && dateStr >= checkOut) {
+        onCheckOutChange("");
+      }
     } else {
-      if (dateStr <= checkIn) {
+      if (checkIn && dateStr <= checkIn) {
         onCheckInChange(dateStr);
         onCheckOutChange("");
-        setSelecting("checkout");
       } else {
         onCheckOutChange(dateStr);
-        setSelecting("checkin");
       }
     }
   };
 
-  const renderMonth = (year: number, month: number) => {
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-    const totalCells = 42;
-    const days: (number | null)[] = [];
+  const monthLabel = new Date(year, month).toLocaleString("en-US", { month: "short" });
 
-    for (let i = 0; i < firstDay; i++) days.push(null);
-    for (let i = 1; i <= daysInMonth; i++) days.push(i);
-    while (days.length < totalCells) days.push(null);
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month);
+  const totalCells = 42;
+  const days: (number | null)[] = [];
 
-    return (
-      <div className="flex-1">
+  for (let i = 0; i < firstDay; i++) days.push(null);
+  for (let i = 1; i <= daysInMonth; i++) days.push(i);
+  while (days.length < totalCells) days.push(null);
+
+  const activeDate = mode === "checkin" ? checkIn : checkOut;
+  const label = mode === "checkin" ? "Check-in" : "Check-out";
+
+  return (
+    <div className="w-full rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl">
+      <div className="flex items-center justify-between border-b border-white/10 px-2.5 py-2 sm:px-4 sm:py-3">
+        <button type="button" onClick={prevMonth} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
+          <ChevronLeft size={14} />
+        </button>
+
+        <div className="flex items-center justify-center text-[10px] font-medium sm:text-xs">
+          <span className="rounded-full bg-[#ff784e] px-3 py-1 font-semibold text-white shadow-sm">
+            {label} {activeDate ? new Date(activeDate + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Select"}
+          </span>
+        </div>
+
+        <button type="button" onClick={nextMonth} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
+          <ChevronRight size={14} />
+        </button>
+      </div>
+
+      <div className="p-3 sm:p-4">
         <div className="mb-2 text-center text-xs font-semibold text-white sm:mb-3 sm:text-sm">
-          {leftMonthLabel === rightMonthLabel ? `${leftMonthLabel} ${leftYear}` : `${new Date(year, month).toLocaleString("en-US", { month: "short" })} ${year}`}
+          {monthLabel} {year}
         </div>
         <div className="mb-1 grid grid-cols-7 gap-0">
           {WEEKDAYS.map((d) => (
@@ -130,17 +139,20 @@ export default function DatePicker({
 
             const dateStr = formatDate(year, month, day);
             const isPast = dateStr < todayStr;
+            const isInvalidCheckout = Boolean(mode === "checkout" && checkIn && dateStr <= checkIn);
+            const isDisabled = isPast || isInvalidCheckout;
             const isCheckIn = isSameDate(dateStr, checkIn);
             const isCheckOut = isSameDate(dateStr, checkOut);
             const inRange = isDateInRange(dateStr, checkIn, checkOut);
             const isToday = dateStr === todayStr;
+            const isActive = mode === "checkin" ? isCheckIn : isCheckOut;
 
             let bgClass = "";
-            if (isCheckIn || isCheckOut) {
-              bgClass = "bg-[#ff784e] text-white font-semibold";
+            if (isActive) {
+              bgClass = "bg-[#ff784e] text-white font-semibold shadow-md";
             } else if (inRange) {
               bgClass = "bg-[#ff784e]/15 text-[#ff784e]";
-            } else if (isPast) {
+            } else if (isDisabled) {
               bgClass = "text-white/20 cursor-not-allowed";
             } else {
               bgClass = "text-white/80 hover:bg-white/10 cursor-pointer";
@@ -150,11 +162,11 @@ export default function DatePicker({
               <button
                 key={dateStr}
                 type="button"
-                disabled={isPast}
+                disabled={Boolean(isDisabled)}
                 onClick={() => handleDateClick(dateStr)}
                 className={`relative flex h-8 w-full items-center justify-center rounded-lg text-[11px] transition-all duration-150 sm:h-9 sm:text-xs ${bgClass}`}
               >
-                {isToday && !(isCheckIn || isCheckOut) && (
+                {isToday && !isActive && (
                   <span className="absolute inset-0 rounded-lg border border-[#ff784e]/40" />
                 )}
                 {day}
@@ -162,39 +174,6 @@ export default function DatePicker({
             );
           })}
         </div>
-      </div>
-    );
-  };
-
-  return (
-    <div ref={panelRef} className="w-full rounded-2xl border border-white/10 bg-black/95 shadow-2xl backdrop-blur-xl">
-      <div className="flex items-center justify-between border-b border-white/10 px-2.5 py-2 sm:px-4 sm:py-3">
-        <button type="button" onClick={prevMonth} className="flex h-7 w-7 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
-          <ChevronLeft size={14} />
-        </button>
-        <div className="flex gap-2 text-[10px] font-medium text-white/50 sm:gap-6 sm:text-xs">
-          <button
-            type="button"
-            onClick={() => setSelecting("checkin")}
-            className={`rounded-full px-2 py-0.9 transition sm:px-3 sm:py-1 ${selecting === "checkin" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
-          >
-            Check-in {checkIn ? new Date(checkIn + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelecting("checkout")}
-            className={`rounded-full px-2 py-0.5 transition sm:px-3 sm:py-1 ${selecting === "checkout" ? "bg-[#ff784e] text-white" : "hover:text-white"}`}
-          >
-            Check-out {checkOut ? new Date(checkOut + "T00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
-          </button>
-        </div>
-        <button type="button" onClick={nextMonth} className="flex h-7 w-7 items-center justify-center rounded-full border border-white/15 text-white/60 transition hover:border-[#ff784e] hover:text-[#ff784e] sm:h-8 sm:w-8">
-          <ChevronRight size={14} />
-        </button>
-      </div>
-
-      <div className="p-3 sm:p-4">
-        {renderMonth(leftYear, leftMonth)}
       </div>
     </div>
   );
