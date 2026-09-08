@@ -28,6 +28,8 @@ import {
   MapPin,
   CalendarDays,
   ChevronDown,
+  X,
+  Camera,
 } from "lucide-react";
 import { roomsData } from "@/lib/roomsData";
 import DatePicker from "@/components/shared/DatePicker";
@@ -44,6 +46,7 @@ function RoomDetailInner() {
   const searchParams = useSearchParams();
   const pageRef = useRef<HTMLDivElement>(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const room = roomsData.find((r) => r.slug === slug);
 
@@ -62,6 +65,18 @@ function RoomDetailInner() {
       return;
     }
   }, [room, router]);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightboxOpen || !room) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowLeft") setActiveImage((p) => (p === 0 ? room.gallery.length - 1 : p - 1));
+      if (e.key === "ArrowRight") setActiveImage((p) => (p === room.gallery.length - 1 ? 0 : p + 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen, room]);
 
   useEffect(() => {
     if (!room) return;
@@ -94,78 +109,181 @@ function RoomDetailInner() {
   return (
     <main ref={pageRef} className="bg-white text-black overflow-hidden">
 
-      {/* HERO */}
-      <section className="relative min-h-[55vh] flex items-end overflow-hidden pt-[86px] lg:min-h-[65vh]">
-        <div className="absolute inset-0">
-          <Image src={room.gallery[activeImage]} alt={room.name} fill priority className="object-cover transition-opacity duration-500" sizes="100vw" unoptimized />
+      {/* LIGHTBOX MODAL */}
+      {lightboxOpen && (
+        <div className="fixed inset-0 z-[150] flex flex-col justify-between bg-black/95 backdrop-blur-2xl p-4 sm:p-6" onClick={() => setLightboxOpen(false)}>
+          {/* Top Header */}
+          <div className="flex items-center justify-between z-20" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3">
+              <span className="text-sm sm:text-base font-serif text-white">{room.name}</span>
+              <span className="text-xs text-white/50">· {activeImage + 1} / {room.gallery.length}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(false)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 hover:border-white hover:text-white transition"
+              aria-label="Close photo viewer"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Main Image View */}
+          <div className="relative my-auto flex-1 flex items-center justify-center min-h-0 py-4" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full max-w-6xl h-[60vh] sm:h-[72vh]">
+              <Image
+                key={activeImage}
+                src={room.gallery[activeImage] || room.image}
+                alt={room.name}
+                fill
+                className="object-contain"
+                unoptimized
+              />
+            </div>
+
+            {/* Navigation Arrows */}
+            <button
+              type="button"
+              onClick={() => setActiveImage((p) => (p === 0 ? room.gallery.length - 1 : p - 1))}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-full border border-white/25 bg-black/50 text-white backdrop-blur-md hover:border-[#ff784e] hover:bg-[#ff784e] transition"
+              aria-label="Previous image"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveImage((p) => (p === room.gallery.length - 1 ? 0 : p + 1))}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-full border border-white/25 bg-black/50 text-white backdrop-blur-md hover:border-[#ff784e] hover:bg-[#ff784e] transition"
+              aria-label="Next image"
+            >
+              <ChevronRight size={22} />
+            </button>
+          </div>
+
+          {/* Bottom Thumbnails */}
+          <div className="flex items-center justify-center gap-2 z-20 overflow-x-auto py-2" onClick={(e) => e.stopPropagation()}>
+            {room.gallery.map((img, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setActiveImage(i)}
+                className={`relative h-12 w-16 sm:h-14 sm:w-20 rounded-lg overflow-hidden shrink-0 transition-all ${
+                  i === activeImage ? "ring-2 ring-[#ff784e] scale-105" : "opacity-50 hover:opacity-100"
+                }`}
+              >
+                <Image src={img} alt="" fill className="object-cover" sizes="80px" unoptimized />
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
+      )}
 
-        {/* Image navigation arrows */}
-        <button type="button" onClick={() => setActiveImage((p) => (p === 0 ? room.gallery.length - 1 : p - 1))}
-          className="absolute left-3 top-1/2 z-20 -translate-y-1/2 sm:left-4 lg:left-8">
-          <div className="flex h-9 w-9 items-center justify-center border border-white/25 text-white backdrop-blur-sm transition-all hover:border-[#ff784e] hover:text-[#ff784e] sm:h-11 sm:w-11">
-            <ChevronLeft size={16} />
-          </div>
-        </button>
-        <button type="button" onClick={() => setActiveImage((p) => (p === room.gallery.length - 1 ? 0 : p + 1))}
-          className="absolute right-3 top-1/2 z-20 -translate-y-1/2 sm:right-4 lg:right-8">
-          <div className="flex h-9 w-9 items-center justify-center border border-white/25 text-white backdrop-blur-sm transition-all hover:border-[#ff784e] hover:text-[#ff784e] sm:h-11 sm:w-11">
-            <ChevronRight size={16} />
-          </div>
+      {/* HERO */}
+      <section className="relative min-h-[50vh] sm:min-h-[65vh] flex items-end overflow-hidden pt-[86px] lg:min-h-[78vh]">
+        {/* Background photo */}
+        <div className="absolute inset-0">
+          <Image
+            key={activeImage}
+            src={room.gallery[activeImage] || room.image}
+            alt={room.name}
+            fill
+            priority
+            className="object-cover object-center transition-all duration-700 ease-out"
+            sizes="100vw"
+            unoptimized
+          />
+        </div>
+
+        {/* Clear, refined lighting overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent hidden sm:block" />
+
+        {/* Fullscreen Button Top Right */}
+        <button
+          type="button"
+          onClick={() => setLightboxOpen(true)}
+          className="absolute right-3 top-24 z-20 flex items-center gap-1.5 rounded-full border border-white/25 bg-black/40 px-3 py-1.5 text-[9px] font-semibold tracking-wider text-white backdrop-blur-md transition-all hover:border-[#ff784e] hover:bg-[#ff784e] sm:right-8 sm:top-28 sm:px-4 sm:py-2 sm:text-[11px] sm:gap-2"
+        >
+          <Maximize2 size={11} className="sm:size-[13]" />
+          <span className="hidden sm:inline">View All ({room.gallery.length} Photos)</span>
+          <span className="sm:hidden">{room.gallery.length} Photos</span>
         </button>
 
-        {/* Dots */}
-        <div className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 flex gap-2 sm:bottom-8">
-          {room.gallery.map((_, i) => (
-            <button key={i} type="button" onClick={() => setActiveImage(i)}
-              className={`h-[3px] transition-all duration-500 ${i === activeImage ? "w-8 bg-[#ff784e]" : "w-4 bg-white/40"}`} />
+        {/* Floating Thumbnails on Hero bottom right */}
+        <div className="absolute right-6 bottom-8 z-20 hidden md:flex items-center gap-2.5 rounded-2xl border border-white/15 bg-black/60 p-2 backdrop-blur-xl shadow-2xl lg:right-10 lg:bottom-10">
+          {room.gallery.map((img, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveImage(i)}
+              className={`relative h-14 w-20 overflow-hidden rounded-xl transition-all duration-300 ${
+                i === activeImage
+                  ? "ring-2 ring-[#ff784e] scale-105 opacity-100"
+                  : "opacity-60 hover:opacity-100 hover:scale-102"
+              }`}
+            >
+              <Image src={img} alt="" fill className="object-cover" sizes="80px" unoptimized />
+            </button>
           ))}
         </div>
 
-        <div className="relative z-10 w-full max-w-[1500px] mx-auto px-6 lg:px-10 pb-14 sm:pb-20">
-          <div className="room-hero-content">
+        {/* Mobile Indicator Dots */}
+        <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 flex gap-1.5 md:hidden">
+          {room.gallery.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveImage(i)}
+              className={`h-[3px] rounded-full transition-all duration-300 ${i === activeImage ? "w-6 bg-[#ff784e]" : "w-2.5 bg-white/40"}`}
+              aria-label={`Go to photo ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 pb-10 sm:pb-16">
+          <div className="room-hero-content max-w-3xl">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 mb-4 text-[11px] text-white/50">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 text-[9px] sm:text-[11px] text-white/60">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
               <span>/</span>
               <Link href="/rooms" className="hover:text-white transition-colors">Rooms</Link>
               <span>/</span>
-              <span className="text-[#ff784e]">{room.name}</span>
+              <span className="text-[#ff784e] font-medium truncate">{room.name}</span>
             </div>
 
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5">
               {room.tag && (
-                <span className="px-3 py-1 text-[8px] font-bold uppercase tracking-[0.15em] bg-[#ff784e] text-white rounded-sm">{room.tag}</span>
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.15em] bg-[#ff784e] text-white rounded-sm">{room.tag}</span>
               )}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5 sm:gap-1">
                 {Array.from({ length: room.stars }).map((_, i) => (
-                  <Star key={i} size={11} className="fill-[#ff784e] text-[#ff784e]" />
+                  <Star key={i} size={9} className="fill-[#ff784e] text-[#ff784e] sm:size-[11]" />
                 ))}
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[68px] font-serif font-light leading-[0.95] text-white">
+            <h1 className="text-2xl sm:text-5xl md:text-6xl font-serif font-light leading-[1.05] text-white">
               {room.name}
             </h1>
-            <p className="mt-2 text-[#ff784e] text-sm font-medium">{room.subtitle}</p>
+            <p className="mt-1.5 sm:mt-2 text-[#ff784e] text-[11px] sm:text-sm font-medium tracking-wide">{room.subtitle}</p>
 
-            <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-8">
+            <div className="mt-3 sm:mt-5 flex flex-col sm:flex-row items-start sm:items-end gap-3 sm:gap-6">
               <div>
-                <span className="text-[9px] text-white/40 font-semibold uppercase tracking-[0.2em]">Starting from</span>
+                <span className="text-[8px] sm:text-[9px] text-white/50 font-semibold uppercase tracking-[0.2em]">Starting from</span>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl sm:text-4xl font-serif font-light text-white">&#x09F3;{room.price}</span>
-                  <span className="text-[11px] text-white/40">/night</span>
+                  <span className="text-xl sm:text-3xl font-serif font-light text-white">&#x09F3;{room.price}</span>
+                  <span className="text-[10px] sm:text-[11px] text-white/50">/night</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <a href="tel:+8801401777888"
-                  className="inline-flex items-center gap-2 border border-white/25 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
-                  <Phone size={13} /> Call to Book
+                  className="inline-flex items-center gap-1.5 sm:gap-2 border border-white/30 bg-black/20 backdrop-blur-sm px-3 sm:px-5 py-2 sm:py-2.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.12em] text-white hover:border-[#ff784e] hover:text-[#ff784e] transition-all rounded-lg">
+                  <Phone size={11} className="sm:size-[13]" /> Call to Book
                 </a>
                 <Link href={bookingLink}
-                  className="group/btn inline-flex items-center gap-2 bg-[#ff784e] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-[0.12em] hover:bg-white hover:text-[#1a1a1a] transition-all rounded-lg">
-                  Book Now <ArrowUpRight size={13} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                  className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#ff784e] text-white px-3 sm:px-5 py-2 sm:py-2.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.12em] hover:bg-white hover:text-[#1a1a1a] transition-all rounded-lg">
+                  Book Now
                 </Link>
               </div>
             </div>
@@ -173,17 +291,21 @@ function RoomDetailInner() {
         </div>
       </section>
 
-      {/* THUMBNAILS */}
-      <section className="border-b border-black/5 bg-white">
-        <div className="max-w-[1500px] mx-auto px-6 lg:px-10">
-          <div className="flex gap-2 py-3 overflow-x-auto">
-            {room.gallery.map((img, i) => (
-              <button key={i} type="button" onClick={() => setActiveImage(i)}
-                className={`relative h-20 w-28 shrink-0 overflow-hidden rounded-lg transition-all ${i === activeImage ? "ring-2 ring-[#ff784e]" : "opacity-60 hover:opacity-100"}`}>
-                <Image src={img} alt="" fill className="object-cover" sizes="112px" unoptimized />
-              </button>
-            ))}
-          </div>
+      {/* MOBILE THUMBNAILS BAR */}
+      <section className="md:hidden border-b border-black/5 bg-[#111] p-3">
+        <div className="flex gap-2 overflow-x-auto">
+          {room.gallery.map((img, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveImage(i)}
+              className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg transition-all ${
+                i === activeImage ? "ring-2 ring-[#ff784e]" : "opacity-60"
+              }`}
+            >
+              <Image src={img} alt="" fill className="object-cover" sizes="96px" unoptimized />
+            </button>
+          ))}
         </div>
       </section>
 
@@ -200,8 +322,8 @@ function RoomDetailInner() {
                   <span className="text-[#ff784e] text-[10px] font-bold uppercase tracking-[0.3em]">About This Room</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-serif font-light text-[#1a1a1a]">{room.name}</h2>
-                <p className="mt-4 text-black/50 text-[14px] leading-7">{room.description}</p>
-                <p className="mt-4 text-black/45 text-[13px] leading-7">{room.longDescription}</p>
+                <p className="mt-4 text-black/60 text-[14px] leading-7">{room.description}</p>
+                <p className="mt-4 text-black/50 text-[13px] leading-7">{room.longDescription}</p>
               </div>
 
               {/* Specs */}
@@ -218,6 +340,47 @@ function RoomDetailInner() {
                     <span className="text-[11px] font-medium text-[#1a1a1a] text-center">{spec.value}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Photo Showcase Grid */}
+              <div className="room-detail-block mt-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Camera size={16} className="text-[#ff784e]" />
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-[#1a1a1a]">Room Photo Gallery</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setLightboxOpen(true)}
+                    className="text-[11px] font-semibold text-[#ff784e] hover:underline flex items-center gap-1"
+                  >
+                    View All ({room.gallery.length}) <ChevronRight size={13} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {room.gallery.map((img, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => { setActiveImage(i); setLightboxOpen(true); }}
+                      className="group relative h-40 overflow-hidden rounded-xl border border-black/[0.06] bg-black/5 transition-all hover:shadow-lg"
+                    >
+                      <Image
+                        src={img}
+                        alt={`${room.name} Photo ${i + 1}`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 640px) 100vw, 33vw"
+                        unoptimized
+                      />
+                      <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
+                          <Maximize2 size={15} />
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Highlights */}
